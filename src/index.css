@@ -1,0 +1,57 @@
+body {
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul > li {
+  padding-block-end: 4px;
+}
+
+ul .icon-button {
+  margin-inline-end: 4px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+}
+
+.sidebar {
+  border-inline-end: 1px solid black;
+  background-color: gainsboro;
+}
+
+.content,
+.sidebar {
+  padding: 20px;
+  height: 100vh;
+}
+
+.icon-button {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  display: inline-block;
+}
+
+.tools {
+  height: 30px;
+}
+
+h3 > small {
+  font-weight: initial;
+  font-style: italic;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+}

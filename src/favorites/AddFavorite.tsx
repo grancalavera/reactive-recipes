@@ -9,33 +9,19 @@ export const AddFavorite = ({ recipe }: { recipe: Recipe }) => {
   const result = useManageFavoritesResult(correlationId);
   const [currentFavorite, setCurrentFavorite] = useState<Favorite>();
 
-  if (result === "Idle") {
+  if (result === "Idle" || result === "Awaiting") {
     return (
-      <section>
-        <aside>
-          <button
-            onClick={() => {
-              const data = createFavorite(recipe.id, recipe.name);
-              setCurrentFavorite(data);
-              addFavorite({ correlationId, data });
-            }}
-          >
-            Add Favorite
-          </button>
-        </aside>
-      </section>
-    );
-  }
-
-  if (result === "Awaiting") {
-    return (
-      <section>
-        <aside>
-          <button disabled>
-            Adding "{currentFavorite?.recipeName}" to favorites...
-          </button>
-        </aside>
-      </section>
+      <button
+        className="icon-button"
+        disabled={result === "Awaiting"}
+        onClick={() => {
+          const data = createFavorite(recipe.id, recipe.name);
+          setCurrentFavorite(data);
+          addFavorite({ correlationId, data });
+        }}
+      >
+        ☆
+      </button>
     );
   }
 

@@ -1,3 +1,24 @@
 {
-  "favorites": []
+  "favorites": [
+    {
+      "id": "7w5-",
+      "recipeId": 5431,
+      "recipeName": "Cinnamon Roll Cheesecake"
+    },
+    {
+      "id": "zGEw",
+      "recipeId": 1358,
+      "recipeName": "Strawberry Cheesecake French Toast"
+    },
+    {
+      "id": "eQPK",
+      "recipeId": 3923,
+      "recipeName": "Crispy Rice Cereal Chocolate Cheesecake"
+    },
+    {
+      "id": "2r2L",
+      "recipeId": 2892,
+      "recipeName": "Apple Pie Cheesecake"
+    }
+  ]
 }

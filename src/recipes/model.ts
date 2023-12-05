@@ -13,20 +13,22 @@ export type Page = {
 };
 
 export type Pagination = {
-  nextPage?: Page;
-  prevPage?: Page;
+  size: number;
+  from: number;
+  nextFrom?: number;
+  prevFrom?: number;
 };
 
 export const getPagination = (
   request: RecipeListRequest,
   count: number
 ): Pagination => {
-  const next = request.from + request.size;
-  const prev = request.from - request.size;
+  const nextFrom = request.from + request.size;
+  const prevFrom = request.from - request.size;
 
-  const pagination: Pagination = {};
-  if (next < count) pagination.nextPage = { size: request.size, from: next };
-  if (prev > -1) pagination.prevPage = { size: request.size, from: prev };
+  const pagination: Pagination = { size: request.size, from: request.from };
+  if (nextFrom < count) pagination.nextFrom = nextFrom;
+  if (prevFrom > -1) pagination.prevFrom = prevFrom;
 
   return pagination;
 };

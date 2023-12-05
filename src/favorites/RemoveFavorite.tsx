@@ -7,12 +7,13 @@ export const RemoveFavorite = ({ id }: { id: string }) => {
   const result = useManageFavoritesResult(correlationId);
   return (
     <button
+      className="icon-button"
       disabled={result === "Awaiting"}
       onClick={() => {
         deleteFavorite({ correlationId, data: id });
       }}
     >
-      Remove from favorites
+      ★
     </button>
   );
 };

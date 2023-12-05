@@ -1,12 +1,12 @@
 import { Subscribe } from "@react-rxjs/core";
 import { Favorites } from "./favorites/Favorites";
-import { RecipeList } from "./recipes/RecipeList";
+import { Recipes } from "./recipes/Recipes";
+import { Layout } from "./Layout";
 
 function App() {
   return (
     <Subscribe>
-      <RecipeList />
-      <Favorites />
+      <Layout sidebar={<Favorites />} content={<Recipes />} />
     </Subscribe>
   );
 }

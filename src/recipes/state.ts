@@ -9,10 +9,10 @@ const recipeListRequest$ = manageRecipeList$.pipe(
   scan((state, signal) => {
     switch (signal.type) {
       case "changePage$": {
-        return { ...state, ...signal.payload };
+        return { ...state, from: signal.payload ?? state.from };
       }
       case "searchRecipes$": {
-        return { ...state, q: signal.payload };
+        return { ...state, q: signal.payload, from: 0 };
       }
       default: {
         assertNever(signal);

@@ -8,12 +8,12 @@ export const RecipeSummary = ({ recipe }: { recipe: Recipe }) => {
 
   return (
     <li key={recipe.id}>
-      {recipe.name}
       {maybeFavoriteId === undefined ? (
         <AddFavorite recipe={recipe} />
       ) : (
         <RemoveFavorite id={maybeFavoriteId} />
       )}
+      {recipe.name}
     </li>
   );
 };
