@@ -1,8 +1,8 @@
 import { useId } from "react";
-import { useManageFavoritesResult } from "./state";
 import { deleteFavorite } from "./signals";
+import { useManageFavoritesResult } from "./state";
 
-export const DeleteFavorite = ({ id }: { id: string }) => {
+export const RemoveFavorite = ({ id }: { id: string }) => {
   const correlationId = useId();
   const result = useManageFavoritesResult(correlationId);
   return (
@@ -12,7 +12,7 @@ export const DeleteFavorite = ({ id }: { id: string }) => {
         deleteFavorite({ correlationId, data: id });
       }}
     >
-      Delete
+      Remove from favorites
     </button>
   );
 };

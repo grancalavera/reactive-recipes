@@ -6,9 +6,20 @@ import { deleteFavorite, favorites$, postFavorite } from "./service";
 import { manageFavorites$ } from "./signals";
 import { assertNever } from "../lib/assertNever";
 
-export const [useFavorites] = bind<Favorite[]>(favorites$.pipe(startWith([])));
+const [useFavorites, sharedFavorites$] = bind<Favorite[]>(
+  favorites$.pipe(startWith([]))
+);
 
-export const [useManageFavoritesResult] = bind(
+const [useFindFavoriteId] = bind((recipeId: number) =>
+  sharedFavorites$.pipe(
+    map(
+      (favorites) =>
+        favorites.find((candidate) => candidate.recipeId === recipeId)?.id
+    )
+  )
+);
+
+const [useManageFavoritesResult] = bind(
   (correlationId: string): ObservableMutationResult<string> =>
     manageFavorites$.pipe(
       filter((candidate) => candidate.payload.correlationId === correlationId),
@@ -37,3 +48,5 @@ export const [useManageFavoritesResult] = bind(
       startWith("Idle" as const)
     )
 );
+
+export { useFavorites, useFindFavoriteId, useManageFavoritesResult };

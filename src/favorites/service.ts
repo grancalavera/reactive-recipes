@@ -1,18 +1,28 @@
-import { Subject, concat, defer, switchMap } from "rxjs";
+import { Subject, concat, switchMap } from "rxjs";
+import { fromFetch } from "rxjs/fetch";
 import { Favorite } from "./model";
 import { wait } from "../lib/wait";
 
-export const getFavorites = async (): Promise<Favorite[]> => {
-  const result = await fetch("/api/favorites");
-  if (!result.ok) {
-    throw new Error(result.statusText);
-  }
-  return result.json();
-};
+const endpoint = "/api/favorites";
+const invalidate$ = new Subject<void>();
+
+const fetchFavorites$ = fromFetch(endpoint).pipe(
+  switchMap((result) => {
+    if (!result.ok) {
+      throw new Error(result.statusText);
+    }
+    return result.json();
+  })
+);
+
+export const favorites$ = concat(
+  fetchFavorites$,
+  invalidate$.pipe(switchMap(() => fetchFavorites$))
+);
 
 export const postFavorite = async (favorite: Favorite): Promise<string> => {
-  console.log("postFavorite", favorite);
-  const result = await fetch("/api/favorites", {
+  await wait(500);
+  const result = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -22,27 +32,18 @@ export const postFavorite = async (favorite: Favorite): Promise<string> => {
   if (!result.ok) {
     throw new Error(result.statusText);
   }
-  await wait(); // simulate it takes time
   invalidate$.next();
   return favorite.id;
 };
 
 export const deleteFavorite = async (id: string): Promise<string> => {
-  const result = await fetch(`/api/favorites/${id}`, {
+  await wait(500);
+  const result = await fetch(`${endpoint}/${id}`, {
     method: "DELETE",
   });
   if (!result.ok) {
     throw new Error(result.statusText);
   }
-  await wait(); // simulate it takes time
   invalidate$.next();
   return id;
 };
-
-const invalidate$ = new Subject<void>();
-const readFavorites$ = defer(() => getFavorites());
-
-export const favorites$ = concat(
-  readFavorites$,
-  invalidate$.pipe(switchMap(() => readFavorites$))
-);

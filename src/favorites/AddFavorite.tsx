@@ -1,13 +1,13 @@
-import { nanoid } from "nanoid";
 import { useId, useState } from "react";
+import { Recipe } from "../recipes/model";
 import { Favorite, createFavorite } from "./model";
-import { addFavorite, resetAddFavorite } from "./signals";
+import { addFavorite, resetFavoritesManager } from "./signals";
 import { useManageFavoritesResult } from "./state";
 
-export const AddFavorite = () => {
+export const AddFavorite = ({ recipe }: { recipe: Recipe }) => {
   const correlationId = useId();
   const result = useManageFavoritesResult(correlationId);
-  const [currentFav, setCurrentFav] = useState<Favorite>();
+  const [currentFavorite, setCurrentFavorite] = useState<Favorite>();
 
   if (result === "Idle") {
     return (
@@ -15,8 +15,8 @@ export const AddFavorite = () => {
         <aside>
           <button
             onClick={() => {
-              const data = createFavorite(0, nanoid(4));
-              setCurrentFav(data);
+              const data = createFavorite(recipe.id, recipe.name);
+              setCurrentFavorite(data);
               addFavorite({ correlationId, data });
             }}
           >
@@ -32,7 +32,7 @@ export const AddFavorite = () => {
       <section>
         <aside>
           <button disabled>
-            Adding "{currentFav?.recipeName}" to favorites...
+            Adding "{currentFavorite?.recipeName}" to favorites...
           </button>
         </aside>
       </section>
@@ -43,12 +43,12 @@ export const AddFavorite = () => {
     <section>
       <aside>
         <h4>
-          "<strong>{currentFav?.recipeName}</strong>" added to Favorites
+          "<strong>{currentFavorite?.recipeName}</strong>" added to Favorites
         </h4>
         <button
           onClick={() => {
-            resetAddFavorite(correlationId);
-            setCurrentFav(undefined);
+            resetFavoritesManager(correlationId);
+            setCurrentFavorite(undefined);
           }}
         >
           ok

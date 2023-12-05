@@ -1,11 +1,11 @@
 import { Subscribe } from "@react-rxjs/core";
 import { Favorites } from "./favorites/Favorites";
-import { AddFavorite } from "./favorites/AddFavorite";
+import { RecipeList } from "./recipes/RecipeList";
 
 function App() {
   return (
     <Subscribe>
-      <AddFavorite />
+      <RecipeList />
       <Favorites />
     </Subscribe>
   );

@@ -9,5 +9,6 @@ const [delete$, deleteFavorite] = createSignal<MutationRequest<string>>();
 const reset = (correlationId: string) =>
   resetAddFavorite({ correlationId, data: undefined });
 
+export { addFavorite, deleteFavorite, reset as resetFavoritesManager };
+
 export const manageFavorites$ = mergeWithKey({ add$, reset$, delete$ });
-export { addFavorite, deleteFavorite, reset as resetAddFavorite };
