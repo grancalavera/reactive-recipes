@@ -115,6 +115,7 @@ state MutationResult {
   Idle --> Awaiting: removeFavorite
   Idle --> Awaiting: bulkRemoveFavorites
   Awaiting --> Success: side effect (network response)
+  Success --> Idle: resetFavoritesResult
 }
 
 state FavoritesList {
