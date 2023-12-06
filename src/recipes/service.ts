@@ -1,5 +1,6 @@
 import { Observable, map, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
+import { httpErrorFromResponse } from "../lib/errors";
 import {
   PaginatedRecipeListResult,
   RecipeListRequest,
@@ -25,11 +26,11 @@ export const recipeList$ = (
       "X-RapidAPI-Host": apiHost,
     },
   }).pipe(
-    switchMap((result) => {
-      if (!result.ok) {
-        throw new Error(result.statusText);
+    switchMap((response) => {
+      if (!response.ok) {
+        throw httpErrorFromResponse(response);
       }
-      return result.json();
+      return response.json();
     }),
     map((data) => {
       const parsed = recipeListResultSchema.parse(data);

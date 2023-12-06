@@ -1,16 +1,17 @@
-import { Subject, concat, switchMap } from "rxjs";
+import { Subject, concat, firstValueFrom, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
+import { HttpError, httpErrorFromResponse } from "../lib/errors";
 import { Favorite, createFavorite } from "./service.model";
 
 const endpoint = "/api/favorites";
 const invalidate$ = new Subject<void>();
 
 const getFavorites$ = fromFetch(endpoint).pipe(
-  switchMap(async (result) => {
-    if (!result.ok) {
-      throw new Error(result.statusText);
+  switchMap(async (response) => {
+    if (!response.ok) {
+      throw httpErrorFromResponse(response);
     }
-    const favorites = await result.json();
+    const favorites = await response.json();
 
     // We create these objects in the client so is ok to "trust" they are correct
     return favorites as Favorite[];
@@ -22,31 +23,42 @@ const favorites$ = concat(
   invalidate$.pipe(switchMap(() => getFavorites$))
 );
 
+const assertRecipeIdIsUnique = async (recipeId: number): Promise<void> => {
+  const favorites = await firstValueFrom(getFavorites$);
+  if (favorites.some((candidate) => candidate.recipeId === recipeId)) {
+    throw new HttpError(
+      400,
+      `Favorite for recipeId=${recipeId} already exists.`
+    );
+  }
+};
+
 const postFavorite = async (
   recipeId: number,
   recipeName: string
 ): Promise<string> => {
+  await assertRecipeIdIsUnique(recipeId);
   const favorite = createFavorite(recipeId, recipeName);
-  const result = await fetch(endpoint, {
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(favorite),
   });
-  if (!result.ok) {
-    throw new Error(result.statusText);
+  if (!response.ok) {
+    throw httpErrorFromResponse(response);
   }
   invalidate$.next();
   return favorite.id;
 };
 
 const deleteFavorite = async (id: string): Promise<string> => {
-  const result = await fetch(`${endpoint}/${id}`, {
+  const response = await fetch(`${endpoint}/${id}`, {
     method: "DELETE",
   });
-  if (!result.ok) {
-    throw new Error(result.statusText);
+  if (!response.ok) {
+    throw httpErrorFromResponse(response);
   }
   invalidate$.next();
   return id;
