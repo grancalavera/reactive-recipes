@@ -11,7 +11,7 @@ ul {
   margin: 0;
 }
 
-ul > li {
+li {
   padding-block-end: 4px;
 }
 

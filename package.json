@@ -6,10 +6,11 @@
   "scripts": {
     "dev:vite": "json-server --watch db.json",
     "dev:server": "vite",
-    "dev": "concurrently --kill-others \"npm run dev:vite\" \"npm run dev:server\"",
+    "dev": "npm run create-db && concurrently --kill-others \"npm run dev:vite\" \"npm run dev:server\"",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "create-db": "echo '{\"favorites\":[]}' > db.json"
   },
   "dependencies": {
     "@react-rxjs/core": "0.10.7",

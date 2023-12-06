@@ -1,29 +1,29 @@
 import { Subject, concat, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
-import { createFavorite } from "./service.model";
+import { Favorite, createFavorite } from "./service.model";
 
 const endpoint = "/api/favorites";
 const invalidate$ = new Subject<void>();
 
-const fetchFavorites$ = fromFetch(endpoint).pipe(
-  switchMap((result) => {
+const getFavorites$ = fromFetch(endpoint).pipe(
+  switchMap(async (result) => {
     if (!result.ok) {
       throw new Error(result.statusText);
     }
-    return result.json();
+    const favorites = await result.json();
+    return favorites as Favorite[];
   })
 );
 
 export const favorites$ = concat(
-  fetchFavorites$,
-  invalidate$.pipe(switchMap(() => fetchFavorites$))
+  getFavorites$,
+  invalidate$.pipe(switchMap(() => getFavorites$))
 );
 
 export const postFavorite = async (
   recipeId: number,
   recipeName: string
 ): Promise<string> => {
-  await wait(500);
   const favorite = createFavorite(recipeId, recipeName);
   const result = await fetch(endpoint, {
     method: "POST",
@@ -40,7 +40,6 @@ export const postFavorite = async (
 };
 
 export const deleteFavorite = async (id: string): Promise<string> => {
-  await wait(500);
   const result = await fetch(`${endpoint}/${id}`, {
     method: "DELETE",
   });
@@ -54,7 +53,6 @@ export const deleteFavorite = async (id: string): Promise<string> => {
 export const bulkDeleteFavorites = async (
   batch: string[]
 ): Promise<string[]> => {
-  await wait(500);
   const uniqueBatch = [...new Set(batch)];
 
   const result = await Promise.allSettled(
@@ -81,6 +79,3 @@ export const bulkDeleteFavorites = async (
 
   return uniqueBatch;
 };
-
-const wait = (howLong: number = 1000): Promise<void> =>
-  new Promise((resolve) => setTimeout(() => resolve(), howLong));

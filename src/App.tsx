@@ -1,7 +1,7 @@
 import { Subscribe } from "@react-rxjs/core";
+import { Layout } from "./components/Layout";
 import { Favorites } from "./favorites/Favorites";
 import { Recipes } from "./recipes/Recipes";
-import { Layout } from "./Layout";
 
 function App() {
   return (
