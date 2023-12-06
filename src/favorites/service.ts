@@ -11,16 +11,18 @@ const getFavorites$ = fromFetch(endpoint).pipe(
       throw new Error(result.statusText);
     }
     const favorites = await result.json();
+
+    // We create these objects in the client so is ok to "trust" they are correct
     return favorites as Favorite[];
   })
 );
 
-export const favorites$ = concat(
+const favorites$ = concat(
   getFavorites$,
   invalidate$.pipe(switchMap(() => getFavorites$))
 );
 
-export const postFavorite = async (
+const postFavorite = async (
   recipeId: number,
   recipeName: string
 ): Promise<string> => {
@@ -39,7 +41,7 @@ export const postFavorite = async (
   return favorite.id;
 };
 
-export const deleteFavorite = async (id: string): Promise<string> => {
+const deleteFavorite = async (id: string): Promise<string> => {
   const result = await fetch(`${endpoint}/${id}`, {
     method: "DELETE",
   });
@@ -50,9 +52,7 @@ export const deleteFavorite = async (id: string): Promise<string> => {
   return id;
 };
 
-export const bulkDeleteFavorites = async (
-  batch: string[]
-): Promise<string[]> => {
+const bulkDeleteFavorites = async (batch: string[]): Promise<string[]> => {
   const uniqueBatch = [...new Set(batch)];
 
   const result = await Promise.allSettled(
@@ -79,3 +79,5 @@ export const bulkDeleteFavorites = async (
 
   return uniqueBatch;
 };
+
+export { bulkDeleteFavorites, deleteFavorite, favorites$, postFavorite };

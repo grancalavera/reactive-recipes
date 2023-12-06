@@ -4,8 +4,8 @@ import { filter, from, map, merge, of, startWith, switchMap } from "rxjs";
 import { assertNever } from "../lib/assertNever";
 import { MutationRequest, ObservableMutationResult } from "../lib/mutation";
 import { Recipe } from "../recipes/model";
-import { Favorite } from "./service.model";
 import * as service from "./service";
+import { Favorite } from "./service.model";
 
 const [add$, addFavorite] = createSignal<MutationRequest<Recipe>>();
 const [remove$, removeFavorite] = createSignal<MutationRequest<string>>();

@@ -1,14 +1,12 @@
 import { FavoriteSelectionHousekeeper } from "./FavoriteSelectionHousekeeper";
-import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
-import { FavoriteSummary } from "./FavoriteSummary";
+import { FavoritesCount } from "./FavoritesCount";
+import { FavoritesList } from "./FavoritesList";
 import { FavoritesLoader } from "./FavoritesLoader";
+import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
-import { useFavorites } from "./state.manage";
 
-export const Favorites = () => {
-  const favorites = useFavorites();
-
-  return (
+export const Favorites = () => (
+  <>
     <section>
       <h3>
         Favorites <FavoritesLoader />
@@ -16,27 +14,12 @@ export const Favorites = () => {
       <div className="ribbon">
         <ToggleSelectAllFavorites />
         <RemoveFavoriteSelection />
-        <FavoriteSelectionHousekeeper />
-        <small>
-          You have {favorites.length} recipe{favorites.length === 1 ? "" : "s"}{" "}
-          in your Favorites
-        </small>
+        <FavoritesCount />
       </div>
       <hr />
-
-      {favorites.length ? (
-        <ul>
-          {favorites.map((favorite) => (
-            <li key={favorite.id}>
-              <FavoriteSummary favorite={favorite} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <>No Favorites</>
-      )}
-
+      <FavoritesList />
       <hr />
     </section>
-  );
-};
+    <FavoriteSelectionHousekeeper />
+  </>
+);

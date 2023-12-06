@@ -11,7 +11,7 @@ export const RecipeList = () => {
   }
 
   if (results.length === 0) {
-    return <>No Results</>;
+    return <>No Results.</>;
   }
 
   return (
