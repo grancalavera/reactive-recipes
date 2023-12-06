@@ -1,23 +1,21 @@
 import { bind } from "@react-rxjs/core";
-import { interval, map, merge, scan, startWith, switchMap } from "rxjs";
-import { defaultRequest } from "./model";
-import { recipeList$ } from "./service";
-import { manageRecipeList$ } from "./signals";
+import { createSignal, mergeWithKey } from "@react-rxjs/utils";
+import { map, merge, scan, startWith, switchMap } from "rxjs";
 import { assertNever } from "../lib/assertNever";
+import { defaultRequest } from "./model";
+import * as service from "./service";
 
-const loading = ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"];
-const loader$ = interval(200).pipe(
-  map((i) => loading[(i + 1) % loading.length]),
-  startWith("")
-);
+const [changePage$, changeRecipesPage] = createSignal<number | undefined>();
+const [search$, searchRecipes] = createSignal<string>();
+const signal$ = mergeWithKey({ changePage$, search$ });
 
-const recipeListRequest$ = manageRecipeList$.pipe(
+const request$ = signal$.pipe(
   scan((state, signal) => {
     switch (signal.type) {
       case "changePage$": {
         return { ...state, from: signal.payload ?? state.from };
       }
-      case "searchRecipes$": {
+      case "search$": {
         return { ...state, q: signal.payload, from: 0 };
       }
       default: {
@@ -29,16 +27,11 @@ const recipeListRequest$ = manageRecipeList$.pipe(
 );
 
 const [useRecipeList, recipes$] = bind(
-  recipeListRequest$.pipe(switchMap((request) => recipeList$(request)))
+  request$.pipe(switchMap(service.recipeList$))
 );
 
 const [useIsLoadingRecipes] = bind(
-  merge(
-    recipes$.pipe(map(() => false)),
-    recipeListRequest$.pipe(map(() => true))
-  )
+  merge(recipes$.pipe(map(() => false)), request$.pipe(map(() => true)))
 );
 
-const [useLoader] = bind(loader$);
-
-export { useRecipeList, useIsLoadingRecipes, useLoader };
+export { changeRecipesPage, searchRecipes, useIsLoadingRecipes, useRecipeList };

@@ -1,11 +1,7 @@
-import { useIsLoadingRecipes, useLoader } from "./state";
+import { LoadingAnimation } from "../components/LoadingAnimation";
+import { useIsLoadingRecipes } from "./state";
 
 export const RecipeLoader = () => {
   const isLoading = useIsLoadingRecipes();
-  return isLoading ? <ShowLoader /> : null;
-};
-
-const ShowLoader = () => {
-  const loader = useLoader();
-  return <small>{loader}</small>;
+  return isLoading ? <LoadingAnimation /> : null;
 };

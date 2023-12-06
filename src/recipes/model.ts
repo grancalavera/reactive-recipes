@@ -56,4 +56,4 @@ export type PaginatedRecipeListResult = RecipeListResult & {
   pagination: Pagination;
 };
 
-export const defaultRequest: RecipeListRequest = { from: 0, size: 5 };
+export const defaultRequest: RecipeListRequest = { from: 0, size: 20 };

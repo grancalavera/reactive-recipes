@@ -21,7 +21,7 @@ ul .icon-button {
 
 .layout {
   display: grid;
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: 500px 1fr;
 }
 
 .sidebar {
@@ -42,8 +42,10 @@ ul .icon-button {
   display: inline-block;
 }
 
-.tools {
+.ribbon {
   height: 30px;
+  display: flex;
+  gap: 4px;
 }
 
 h3 > small {

@@ -1,17 +1,15 @@
 import { useId } from "react";
-import { deleteFavorite } from "./signals";
-import { useManageFavoritesResult } from "./state";
+import { removeFavorite, useFavoritesResult } from "./state.manage";
 
 export const RemoveFavorite = ({ id }: { id: string }) => {
   const correlationId = useId();
-  const result = useManageFavoritesResult(correlationId);
+  const result = useFavoritesResult(correlationId);
+
   return (
     <button
       className="icon-button"
       disabled={result === "Awaiting"}
-      onClick={() => {
-        deleteFavorite({ correlationId, data: id });
-      }}
+      onClick={() => removeFavorite({ correlationId, data: id })}
     >
       ★
     </button>

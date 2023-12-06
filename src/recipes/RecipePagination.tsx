@@ -1,5 +1,4 @@
-import { changePage } from "./signals";
-import { useIsLoadingRecipes, useRecipeList } from "./state";
+import { changeRecipesPage, useIsLoadingRecipes, useRecipeList } from "./state";
 
 export const RecipePagination = () => {
   const { pagination, count } = useRecipeList();
@@ -13,7 +12,7 @@ export const RecipePagination = () => {
       <button
         className="icon-button"
         disabled={pagination.prevFrom === undefined || isLoading}
-        onClick={() => changePage(pagination.prevFrom)}
+        onClick={() => changeRecipesPage(pagination.prevFrom)}
       >
         ⬅️
       </button>
@@ -23,7 +22,7 @@ export const RecipePagination = () => {
       <button
         className="icon-button"
         disabled={pagination.nextFrom === undefined || isLoading}
-        onClick={() => changePage(pagination.nextFrom)}
+        onClick={() => changeRecipesPage(pagination.nextFrom)}
       >
         ➡️
       </button>

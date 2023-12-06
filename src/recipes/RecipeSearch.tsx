@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { searchRecipes } from "./signals";
-import { useIsLoadingRecipes } from "./state";
+import { useIsLoadingRecipes, searchRecipes } from "./state";
 
 export const RecipeSearch = () => {
   const [query, setQuery] = useState("");
   const isLoading = useIsLoadingRecipes();
 
   return (
-    <div className="tools">
+    <div className="ribbon">
       <input
         placeholder="search"
         value={query}

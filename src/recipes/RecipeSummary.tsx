@@ -1,6 +1,6 @@
 import { AddFavorite } from "../favorites/AddFavorite";
 import { RemoveFavorite } from "../favorites/RemoveFavorite";
-import { useFindFavoriteId } from "../favorites/state";
+import { useFindFavoriteId } from "../favorites/state.manage";
 import { Recipe } from "./model";
 
 export const RecipeSummary = ({ recipe }: { recipe: Recipe }) => {
