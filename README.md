@@ -19,6 +19,11 @@ https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489
 - [concurrently](https://github.com/open-cli-tools/concurrently)
 - [RapidAPI](https://rapidapi.com)
 
+## Reference Material
+
+- For an intuition on how to design functional services, read [Domain Modeling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/)
+- For an intuition on what is considered a side effect, and how to compose side effects, watch [Duality and the End of Reactive](https://youtu.be/SVYGmGYXLpY?si=SC6OFZWVsHUSIXEBb)
+
 ## RapidAPI and Tasty
 
 You need to create a [RapidAPI](https://rapidapi.com) account and subscribe to the [tasty](https://rapidapi.com/apidojo/api/tasty) API.
