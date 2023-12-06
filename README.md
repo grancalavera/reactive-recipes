@@ -132,3 +132,5 @@ MutationResult --> FavoritesList: side effect (invalidate)
 
 - [ ] Error handling.
 - [ ] Representing mutations with [MutationResult](src/lib/mutation.ts) probably needs more work.
+- [ ] Unit tests?
+- [ ] Integration tests?
