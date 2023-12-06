@@ -39,9 +39,7 @@ const instructionStep = z.object({
 
 const recipeSchema = z.object({
   id: z.number(),
-  description: z.string(),
   name: z.string(),
-  instructions: instructionStep.array(),
 });
 
 export const recipeListResultSchema = z.object({

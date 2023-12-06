@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { searchRecipes } from "./signals";
+import { useIsLoadingRecipes } from "./state";
 
 export const RecipeSearch = () => {
   const [query, setQuery] = useState("");
+  const isLoading = useIsLoadingRecipes();
 
   return (
     <div className="tools">
@@ -13,7 +15,7 @@ export const RecipeSearch = () => {
       />{" "}
       <button
         className="icon-button"
-        disabled={query === ""}
+        disabled={query === "" || isLoading}
         onClick={() => {
           searchRecipes(query);
         }}
@@ -22,7 +24,7 @@ export const RecipeSearch = () => {
       </button>{" "}
       <button
         className="icon-button"
-        disabled={query === ""}
+        disabled={query === "" || isLoading}
         onClick={() => {
           setQuery("");
           searchRecipes("");
