@@ -4,7 +4,6 @@ export type RecipeListRequest = {
   from: number;
   size: number;
   q?: string;
-  sort?: "approved_at:desc" | "approved_at:asc";
 };
 
 export type Page = {

@@ -1,29 +1,29 @@
 import { Favorite } from "./service.model";
 
-export type Selection = Record<string, boolean>;
-export const emptySelection: Selection = {};
+export type FavoritesSelection = Record<string, boolean>;
+export const emptySelection: FavoritesSelection = {};
 
 export const selectFavorite = (
-  selection: Selection,
+  selection: FavoritesSelection,
   id: string
-): Selection => ({
+): FavoritesSelection => ({
   ...selection,
   [id]: true,
 });
 
 export const deselectFavorite = (
-  selection: Selection,
+  selection: FavoritesSelection,
   id: string
-): Selection => {
+): FavoritesSelection => {
   const copy = { ...selection };
   delete copy[id];
   return copy;
 };
 
 export const bulkDeselectFavorites = (
-  selection: Selection,
+  selection: FavoritesSelection,
   ids: string[]
-): Selection => {
+): FavoritesSelection => {
   const copy = { ...selection };
   ids.forEach((id) => {
     delete copy[id];
@@ -31,18 +31,18 @@ export const bulkDeselectFavorites = (
   return copy;
 };
 
-export const selectAllFavorites = (ids: string[]): Selection =>
+export const selectAllFavorites = (ids: string[]): FavoritesSelection =>
   Object.fromEntries(ids.map((key) => [key, true]));
 
 export const isFavoriteSelected =
   (candidate: string) =>
-  (selection: Selection): boolean =>
+  (selection: FavoritesSelection): boolean =>
     selection[candidate] ?? false;
 
-export const isFavoritesSelectionEmpty = (selection: Selection) =>
+export const isFavoritesSelectionEmpty = (selection: FavoritesSelection) =>
   Object.keys(selection).length === 0;
 
-export const favoritesSelection = (selection: Selection) =>
+export const favoritesSelection = (selection: FavoritesSelection) =>
   Object.keys(selection);
 
 export const zombieFavoritesSelection = (
