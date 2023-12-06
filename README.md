@@ -38,6 +38,7 @@ Imagine you want to transition between two states: `Idle` and `Engaged` using a 
 
 ```mermaid
 stateDiagram-v2
+direction LR
 
 [*] --> Idle
 Idle --> Engaged: begin
@@ -88,15 +89,40 @@ state RecipeListRequest {
   SearchWithQuery --> SearchWithQuery: changeRecipesPage
   SearchWithQuery --> DefaultSearch: searchRecipes(q = "")
 }
+
+
 ```
 
 That intermediate state represents the arguments for a service call. By composing `RecipeListRequest` with an observable service, we produce [`PaginatedRecipeListResult`](src/recipes/model.ts), which is the final state we want to offer as a public API of our application.
 
 Is worth noting this composition has side effects (errors and network calls), but the result is exposed in the same resulting observable state. This is usually the case with read operations, but more often than not **is not the case with mutations**. As seen before, mutation usually have the common side effects (errors, network calls, asynchronicity), but on top of that their result may affect the emissions of other pieces of observable state.
 
-For example, triggering the `addFavorite` transition in [`favorites/state.manage.ts`](src/favorites/state.manage.ts) emits the result of the mutation (`Result<string | string[]>`), which represents the IDs of the successfully manipulated `Favorite` objects. But additionally, it produces an emission of `Favorite[]` for all components using the `useFavorites` hook from the same file.
+For example, triggering the `addFavorite` transition in [`favorites/state.manage.ts`](src/favorites/state.manage.ts) emits the result of the mutation (`Result<string | string[]>`), which represents the IDs of the successfully manipulated `Favorite` objects. But additionally, it produces an emission of `Favorite[]` for all components using the `useFavorites` hook from the same file (errors are implicit and not shown).
+
+```mermaid
+stateDiagram-v2
+direction LR
+
+state MutationResult {
+  [*] --> Idle
+  Idle --> Awaiting: addFavorite
+  Idle --> Awaiting: removeFavorite
+  Idle --> Awaiting: bulkRemoveFavorites
+  Awaiting --> Success: side effect (network response)
+}
+
+state FavoritesList {
+  state "Favorite[]" as F
+  [*] --> F: side effect (network response)
+  F --> F: side effect (network response)
+}
+
+MutationResult --> FavoritesList: side effect (invalidate)
+
+
+```
 
 ## Todo
 
-- [ ] Error handling
-- [ ] Representing mutations with [FavoritesSelection](src/lib/mutation.ts) probably needs more work
+- [ ] Error handling.
+- [ ] Representing mutations with [MutationResult](src/lib/mutation.ts) probably needs more work.
