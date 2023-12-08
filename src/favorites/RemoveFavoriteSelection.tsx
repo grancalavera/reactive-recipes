@@ -1,52 +1,75 @@
-import { useId } from "react";
+import { nanoid } from "nanoid";
 import { isSuccess } from "../lib/mutation";
 import {
   bulkRemoveFavorites,
   resetFavoritesResult,
   useFavoritesResult,
 } from "./state.manage";
-import { useIsFavoriteDisabled, useFavoriteSelection } from "./state.selection";
+import { useFavoriteSelection, useIsFavoriteDisabled } from "./state.selection";
+import { bind } from "@react-rxjs/core";
+import { map, timer } from "rxjs";
+import { useEffect } from "react";
+import { set } from "zod";
+
+const REMOVE_ALL_FAVORITES = nanoid();
 
 export const RemoveFavoriteSelection = () => {
-  const correlationId = useId();
   const isDisabled = useIsFavoriteDisabled();
   const selection = useFavoriteSelection();
-
-  const result = useFavoritesResult(correlationId);
 
   return (
     <>
       <button
         className="icon-button"
         disabled={isDisabled}
-        onClick={() => bulkRemoveFavorites({ correlationId, data: selection })}
+        onClick={() =>
+          bulkRemoveFavorites({
+            correlationId: REMOVE_ALL_FAVORITES,
+            data: selection,
+          })
+        }
       >
         🗑️
       </button>
-      {isSuccess(result) &&
-      Array.isArray(result.data) &&
-      selection.length === 0 ? (
-        <Confirmation
-          onDismiss={() => resetFavoritesResult(correlationId)}
-          data={result.data}
-        />
-      ) : null}
     </>
   );
 };
 
-const Confirmation = ({
-  onDismiss,
-  data,
+export const RemoveFavoriteSelectionConfirmation = () => {
+  const result = useFavoritesResult(REMOVE_ALL_FAVORITES);
+
+  if (isSuccess(result, (data): data is string[] => Array.isArray(data))) {
+    const data = result.data;
+    return (
+      <Toast
+        message={`${data.length} favorite${
+          data.length == 1 ? "" : "s"
+        } removed`}
+        onClose={() => resetFavoritesResult(REMOVE_ALL_FAVORITES)}
+      />
+    );
+  }
+
+  return null;
+};
+
+const Toast = ({
+  message,
+  onClose,
 }: {
-  onDismiss: () => void;
-  data: string[];
+  message: string;
+  onClose: () => void;
 }) => {
+  useEffect(() => {
+    const tid = setTimeout(onClose, 5000);
+    return () => clearTimeout(tid);
+  });
+
   return (
-    <small>
-      {`${data.length} favorite${data.length == 1 ? "" : "s"} removed.`}
-      <button className="icon-button" onClick={() => onDismiss()}>
-        🆗
+    <small className="ribbon toast">
+      {message}
+      <button className="plain-button" onClick={() => onClose()}>
+        ✕
       </button>
     </small>
   );

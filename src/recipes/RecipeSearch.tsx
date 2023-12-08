@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useIsLoadingRecipes, searchRecipes } from "./state";
+import {
+  useIsLoadingRecipes,
+  searchRecipes,
+  clearRecipesSearch,
+} from "./state";
 
 export const RecipeSearch = () => {
   const [query, setQuery] = useState("");
@@ -7,11 +11,23 @@ export const RecipeSearch = () => {
 
   return (
     <div className="ribbon">
-      <input
-        placeholder="search"
-        value={query}
-        onChange={(ev) => setQuery(ev.target.value)}
-      />{" "}
+      <span className="input-with-clear">
+        <input
+          placeholder="search"
+          value={query}
+          onChange={(ev) => setQuery(ev.target.value)}
+        />{" "}
+        <button
+          className="plain-button"
+          disabled={query === "" || isLoading}
+          onClick={() => {
+            setQuery("");
+            clearRecipesSearch();
+          }}
+        >
+          ⤫
+        </button>
+      </span>
       <button
         className="icon-button"
         disabled={query === "" || isLoading}
@@ -21,16 +37,6 @@ export const RecipeSearch = () => {
       >
         ⏎
       </button>{" "}
-      <button
-        className="icon-button"
-        disabled={query === "" || isLoading}
-        onClick={() => {
-          setQuery("");
-          searchRecipes("");
-        }}
-      >
-        ⤫
-      </button>
     </div>
   );
 };

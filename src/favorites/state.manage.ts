@@ -16,7 +16,7 @@ const [reset$, resetFavoritesResult] = createSignal<
   MutationRequest<void>
 >((correlationId) => ({ correlationId, data: undefined }));
 
-export const request$ = mergeWithKey({
+const request$ = mergeWithKey({
   add$,
   reset$,
   remove$,
