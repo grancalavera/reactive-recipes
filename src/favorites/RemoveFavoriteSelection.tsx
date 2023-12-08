@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { useEffect } from "react";
 import { isSuccess } from "../lib/mutation";
 import {
   bulkRemoveFavorites,
@@ -6,10 +7,6 @@ import {
   useFavoritesResult,
 } from "./state.manage";
 import { useFavoriteSelection, useIsFavoriteDisabled } from "./state.selection";
-import { bind } from "@react-rxjs/core";
-import { map, timer } from "rxjs";
-import { useEffect } from "react";
-import { set } from "zod";
 
 const REMOVE_ALL_FAVORITES = nanoid();
 
@@ -61,7 +58,7 @@ const Toast = ({
   onClose: () => void;
 }) => {
   useEffect(() => {
-    const tid = setTimeout(onClose, 5000);
+    const tid = setTimeout(onClose, 2000);
     return () => clearTimeout(tid);
   });
 

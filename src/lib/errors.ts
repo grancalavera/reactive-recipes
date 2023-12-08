@@ -12,3 +12,6 @@ export class HttpError extends Error {
 
 export const httpErrorFromResponse = (response: Response): HttpError =>
   new HttpError(response.status, response.statusText);
+
+export const isHttpError = (candidate: unknown): candidate is HttpError =>
+  candidate instanceof HttpError;
