@@ -24,8 +24,13 @@ export const bulkDeselectFavorites = (
   return selection;
 };
 
-export const selectAllFavorites = (ids: string[]): FavoritesSelection =>
-  new Set(ids);
+export const selectAllFavorites = (
+  selection: FavoritesSelection,
+  ids: string[]
+): FavoritesSelection => {
+  ids.forEach((id) => selection.add(id));
+  return selection;
+};
 
 export const isFavoriteSelected =
   (candidate: string) =>
@@ -35,7 +40,7 @@ export const isFavoriteSelected =
 export const isFavoritesSelectionEmpty = (selection: FavoritesSelection) =>
   selection.size === 0;
 
-export const favoritesSelection = (selection: FavoritesSelection) => [
+export const selectionToArray = (selection: FavoritesSelection) => [
   ...selection,
 ];
 

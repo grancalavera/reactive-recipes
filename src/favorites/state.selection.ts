@@ -1,14 +1,6 @@
 import { bind, state } from "@react-rxjs/core";
 import { createSignal, mergeWithKey } from "@react-rxjs/utils";
-import {
-  combineLatest,
-  distinctUntilChanged,
-  first,
-  map,
-  scan,
-  startWith,
-  switchMap,
-} from "rxjs";
+import { combineLatest, first, map, scan, startWith, switchMap } from "rxjs";
 import { assertNever } from "../lib/assertNever";
 import { favorites$ } from "./state.manage";
 import * as model from "./state.model";
@@ -57,7 +49,7 @@ const state$ = state(
           return model.emptySelection;
         }
         case "selectAll$": {
-          return model.selectAllFavorites(signal.payload);
+          return model.selectAllFavorites(selection, signal.payload);
         }
         default: {
           assertNever(signal);
@@ -73,16 +65,13 @@ const [useIsFavoriteSelected] = bind((id: string) =>
 );
 
 const [useFavoriteSelection, selection$] = bind(
-  state$.pipe(map(model.favoritesSelection))
+  state$.pipe(map(model.selectionToArray))
 );
 
 const [useZombieFavoriteSelection] = bind(
   combineLatest([selection$, favorites$]).pipe(
     map(([selection, favorites]) =>
       model.zombieFavoritesSelection(selection, favorites)
-    ),
-    distinctUntilChanged(
-      (previous, current) => previous.join("") === current.join("")
     )
   )
 );
