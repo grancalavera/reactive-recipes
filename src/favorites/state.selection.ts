@@ -10,8 +10,20 @@ import {
   switchMap,
 } from "rxjs";
 import { assertNever } from "../lib/assertNever";
-import { favorites$, isLoadingFavorites$ } from "./state.manage";
+import { favorites$ } from "./state.manage";
 import * as model from "./state.model";
+
+export {
+  bulkDeselectFavorites,
+  deselectAllFavorites,
+  deselectFavorite,
+  selectAllFavorites,
+  selectFavorite,
+  useAreAllFavoritesSelected,
+  useFavoriteSelection,
+  useIsFavoriteSelected,
+  useZombieFavoriteSelection,
+};
 
 const [select$, selectFavorite] = createSignal<string>();
 const [deselect$, deselectFavorite] = createSignal<string>();
@@ -85,28 +97,3 @@ const [useAreAllFavoritesSelected] = bind(
     )
   )
 );
-
-const [useIsFavoriteDisabled] = bind(
-  combineLatest([
-    isLoadingFavorites$,
-    state$.pipe(map(model.isFavoritesSelectionEmpty)),
-  ]).pipe(
-    map(
-      ([isLoadingFavorite, isSelectionEmpty]) =>
-        isLoadingFavorite || isSelectionEmpty
-    )
-  )
-);
-
-export {
-  bulkDeselectFavorites,
-  deselectAllFavorites,
-  deselectFavorite,
-  selectAllFavorites,
-  selectFavorite,
-  useAreAllFavoritesSelected,
-  useFavoriteSelection,
-  useIsFavoriteDisabled,
-  useIsFavoriteSelected,
-  useZombieFavoriteSelection,
-};

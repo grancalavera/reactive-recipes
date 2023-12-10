@@ -2,10 +2,7 @@ import { FavoriteSelectionHousekeeper } from "./FavoriteSelectionHousekeeper";
 import { FavoritesCount } from "./FavoritesCount";
 import { FavoritesList } from "./FavoritesList";
 import { FavoritesLoader } from "./FavoritesLoader";
-import {
-  RemoveFavoriteSelection,
-  RemoveFavoriteSelectionConfirmation,
-} from "./RemoveFavoriteSelection";
+import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
 
 export const Favorites = () => (
@@ -24,6 +21,5 @@ export const Favorites = () => (
       <hr />
     </section>
     <FavoriteSelectionHousekeeper />
-    <RemoveFavoriteSelectionConfirmation />
   </>
 );

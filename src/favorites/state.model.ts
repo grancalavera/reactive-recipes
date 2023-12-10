@@ -20,7 +20,6 @@ export const bulkDeselectFavorites = (
   selection: FavoritesSelection,
   ids: string[]
 ): FavoritesSelection => {
-  console.log({ selection, ids });
   ids.forEach((id) => selection.delete(id));
   return selection;
 };

@@ -1,16 +1,17 @@
-import { useId } from "react";
+import { isLoading, isSuccess } from "../lib/result";
 import { Recipe } from "../recipes/model";
-import { addFavorite, useFavoritesResult } from "./state.manage";
+import { useAddFavorite, useIsFavoriteRecipe } from "./state.manage";
 
 export const AddFavorite = ({ recipe }: { recipe: Recipe }) => {
-  const correlationId = useId();
-  const result = useFavoritesResult(correlationId);
+  const { mutate, result } = useAddFavorite();
+  const isFavorite = useIsFavoriteRecipe(recipe.id);
+  const loading = isLoading(result) || (isSuccess(result) && !isFavorite);
 
   return (
     <button
       className="icon-button"
-      disabled={result !== "Idle"}
-      onClick={() => addFavorite({ correlationId, data: recipe })}
+      disabled={loading}
+      onClick={() => mutate({ recipeId: recipe.id, recipeName: recipe.name })}
     >
       ☆
     </button>

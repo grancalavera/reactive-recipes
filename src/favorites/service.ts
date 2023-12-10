@@ -1,4 +1,4 @@
-import { Subject, concat, firstValueFrom, switchMap } from "rxjs";
+import { Subject, concat, debounceTime, firstValueFrom, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
 import { HttpError, httpErrorFromResponse } from "../lib/errors";
 import { Favorite, createFavorite } from "./service.model";
@@ -20,7 +20,10 @@ const getFavorites$ = fromFetch(endpoint).pipe(
 
 const favorites$ = concat(
   getFavorites$,
-  invalidate$.pipe(switchMap(() => getFavorites$))
+  invalidate$.pipe(
+    debounceTime(500),
+    switchMap(() => getFavorites$)
+  )
 );
 
 const assertRecipeIdIsUnique = async (recipeId: number): Promise<void> => {
@@ -33,10 +36,10 @@ const assertRecipeIdIsUnique = async (recipeId: number): Promise<void> => {
   }
 };
 
-const postFavorite = async (
-  recipeId: number,
-  recipeName: string
-): Promise<string> => {
+const postFavorite = async ({
+  recipeId,
+  recipeName,
+}: Omit<Favorite, "id">): Promise<string> => {
   await assertRecipeIdIsUnique(recipeId);
   const favorite = createFavorite(recipeId, recipeName);
   const response = await fetch(endpoint, {
