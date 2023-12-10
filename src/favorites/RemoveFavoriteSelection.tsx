@@ -1,73 +1,32 @@
-import { nanoid } from "nanoid";
 import { useEffect } from "react";
-import { isSuccess } from "../lib/mutation";
-import {
-  bulkRemoveFavorites,
-  resetFavoritesResult,
-  useFavoritesResult,
-} from "./state.manage";
-import { useFavoriteSelection, useIsFavoriteDisabled } from "./state.selection";
-
-const REMOVE_ALL_FAVORITES = nanoid();
+import { isIdle, isSuccess } from "../lib/result";
+import { useBulkRemoveFavorites } from "./state.manage";
+import { useFavoriteSelection } from "./state.selection";
+import { toast } from "react-toastify";
 
 export const RemoveFavoriteSelection = () => {
-  const isDisabled = useIsFavoriteDisabled();
   const selection = useFavoriteSelection();
+  const { mutate, result, reset } = useBulkRemoveFavorites();
+  const isSelectionEmpty = selection.length === 0;
+  const enabled = isIdle(result) && !isSelectionEmpty;
 
-  return (
-    <>
-      <button
-        className="icon-button"
-        disabled={isDisabled}
-        onClick={() =>
-          bulkRemoveFavorites({
-            correlationId: REMOVE_ALL_FAVORITES,
-            data: selection,
-          })
-        }
-      >
-        🗑️
-      </button>
-    </>
-  );
-};
-
-export const RemoveFavoriteSelectionConfirmation = () => {
-  const result = useFavoritesResult(REMOVE_ALL_FAVORITES);
-
-  if (isSuccess(result, (data): data is string[] => Array.isArray(data))) {
-    const data = result.data;
-    return (
-      <Toast
-        message={`${data.length} favorite${
-          data.length == 1 ? "" : "s"
-        } removed`}
-        onClose={() => resetFavoritesResult(REMOVE_ALL_FAVORITES)}
-      />
-    );
-  }
-
-  return null;
-};
-
-const Toast = ({
-  message,
-  onClose,
-}: {
-  message: string;
-  onClose: () => void;
-}) => {
   useEffect(() => {
-    const tid = setTimeout(onClose, 2000);
-    return () => clearTimeout(tid);
-  });
+    if (isSuccess(result) && isSelectionEmpty) {
+      const one = result.data.length === 1;
+      toast.success(`${result.data.length} favorite${one ? "" : "s"} removed`, {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+      reset();
+    }
+  }, [result, reset, isSelectionEmpty]);
 
   return (
-    <small className="ribbon toast">
-      {message}
-      <button className="plain-button" onClick={() => onClose()}>
-        ✕
-      </button>
-    </small>
+    <button
+      className="icon-button"
+      disabled={!enabled}
+      onClick={() => mutate(selection)}
+    >
+      🗑️
+    </button>
   );
 };

@@ -1,17 +1,17 @@
 import { AddFavorite } from "../favorites/AddFavorite";
 import { RemoveFavorite } from "../favorites/RemoveFavorite";
-import { useFindFavoriteId } from "../favorites/state.manage";
+import { useFindFavoriteByRecipeId } from "../favorites/state.manage";
 import { Recipe } from "./model";
 
 export const RecipeSummary = ({ recipe }: { recipe: Recipe }) => {
-  const maybeFavoriteId = useFindFavoriteId(recipe.id);
+  const maybeFavorite = useFindFavoriteByRecipeId(recipe.id);
 
   return (
     <li key={recipe.id}>
-      {maybeFavoriteId === undefined ? (
-        <AddFavorite recipe={recipe} />
+      {maybeFavorite ? (
+        <RemoveFavorite id={maybeFavorite.id} />
       ) : (
-        <RemoveFavorite id={maybeFavoriteId} />
+        <AddFavorite recipe={recipe} />
       )}
       {recipe.name}
     </li>

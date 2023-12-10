@@ -1,99 +1,59 @@
 import { bind } from "@react-rxjs/core";
-import { createSignal, mergeWithKey } from "@react-rxjs/utils";
-import { filter, from, map, merge, of, startWith, switchMap } from "rxjs";
-import { assertNever } from "../lib/assertNever";
-import { MutationRequest, ObservableMutationResult } from "../lib/mutation";
-import { Recipe } from "../recipes/model";
+import { createSignal } from "@react-rxjs/utils";
+import { map, merge, startWith } from "rxjs";
+import { MutationOptions, useMutation } from "../lib/mutation";
 import * as service from "./service";
 import { Favorite } from "./service.model";
 
-const [add$, addFavorite] = createSignal<MutationRequest<Recipe>>();
-const [remove$, removeFavorite] = createSignal<MutationRequest<string>>();
-const [bulkRemoveFavorites$, bulkRemoveFavorites] =
-  createSignal<MutationRequest<string[]>>();
-const [reset$, resetFavoritesResult] = createSignal<
-  [string],
-  MutationRequest<void>
->((correlationId) => ({ correlationId, data: undefined }));
-
-const request$ = mergeWithKey({
-  add$,
-  reset$,
-  remove$,
-  bulkRemoveFavorites$,
-});
+export {
+  favorites$,
+  findFavoriteByRecipeId$,
+  useAddFavorite,
+  useBulkRemoveFavorites,
+  useFavorites,
+  useFindFavoriteByRecipeId,
+  useIsFavoriteRecipe,
+  useIsFavoritesEmpty,
+  useIsLoadingFavorites,
+  useRemoveFavorite,
+  useIsFavoriteById,
+};
 
 const [useFavorites, favorites$] = bind<Favorite[]>(
   service.favorites$.pipe(startWith([]))
 );
 
-const [useFindFavoriteId] = bind((recipeId: number) =>
-  favorites$.pipe(
-    map(
-      (favorites) =>
-        favorites.find((candidate) => candidate.recipeId === recipeId)?.id
-    )
-  )
-);
-
-const [useFavoritesResult] = bind(
-  (correlationId: string): ObservableMutationResult<string | string[]> =>
-    request$.pipe(
-      filter((candidate) => candidate.payload.correlationId === correlationId),
-      switchMap((request) => {
-        switch (request.type) {
-          case "reset$": {
-            return of("Idle" as const);
-          }
-          case "add$": {
-            const recipe = request.payload.data;
-            return from(service.postFavorite(recipe.id, recipe.name)).pipe(
-              map((data) => ({ data })),
-              startWith("Awaiting" as const)
-            );
-          }
-          case "remove$": {
-            return from(service.deleteFavorite(request.payload.data)).pipe(
-              map((data) => ({ data })),
-              startWith("Awaiting" as const)
-            );
-          }
-          case "bulkRemoveFavorites$": {
-            return from(service.bulkDeleteFavorites(request.payload.data)).pipe(
-              map((data) => ({ data })),
-              startWith("Awaiting" as const)
-            );
-          }
-          default: {
-            assertNever(request);
-          }
-        }
-      }),
-      startWith("Idle" as const)
+const [useFindFavoriteByRecipeId, findFavoriteByRecipeId$] = bind(
+  (recipeId: number) =>
+    favorites$.pipe(
+      map((favorites) => favorites.find((_) => _.recipeId === recipeId))
     )
 );
 
-const [useIsLoadingFavorites, isLoadingFavorites$] = bind(
-  merge(
-    favorites$.pipe(map(() => false)),
-    request$.pipe(map((signal$) => (signal$.type === "reset$" ? false : true)))
-  ).pipe(startWith(false))
+const [useIsFavoriteRecipe] = bind((recipeId: number) =>
+  findFavoriteByRecipeId$(recipeId).pipe(map(Boolean))
 );
 
-const [useIsFavoritesEmpty] = bind(
-  favorites$.pipe(map((favorites) => favorites.length === 0))
+const [useIsFavoriteById] = bind((id: string) =>
+  favorites$.pipe(map((favorites) => favorites.some((_) => _.id === id)))
 );
 
-export {
-  addFavorite,
-  bulkRemoveFavorites,
-  favorites$,
-  isLoadingFavorites$,
-  removeFavorite,
-  resetFavoritesResult,
-  useFavorites,
-  useFavoritesResult,
-  useFindFavoriteId,
-  useIsFavoritesEmpty,
-  useIsLoadingFavorites,
+const [useIsFavoritesEmpty] = bind(favorites$.pipe(map((_) => _.length === 0)));
+
+const [isLoading$, setLoading] = createSignal<boolean>();
+
+const mutationOptions: MutationOptions = {
+  onMutationStart: () => setLoading(true),
 };
+
+const useAddFavorite = () => useMutation(service.postFavorite, mutationOptions);
+
+const useRemoveFavorite = () =>
+  useMutation(service.deleteFavorite, mutationOptions);
+
+const useBulkRemoveFavorites = () =>
+  useMutation(service.bulkDeleteFavorites, mutationOptions);
+
+const [useIsLoadingFavorites] = bind(
+  merge(favorites$.pipe(map(() => false)), isLoading$).pipe(startWith(false))
+);

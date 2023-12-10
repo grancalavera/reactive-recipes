@@ -15,3 +15,21 @@ export const httpErrorFromResponse = (response: Response): HttpError =>
 
 export const isHttpError = (candidate: unknown): candidate is HttpError =>
   candidate instanceof HttpError;
+
+export function errorFromUnknown(candidate: unknown): Error {
+  if (candidate instanceof Error) {
+    return candidate;
+  }
+
+  let errorMessage: string;
+
+  if (typeof candidate === "string") {
+    errorMessage = candidate;
+  } else if (candidate instanceof Object && candidate !== null) {
+    errorMessage = JSON.stringify(candidate);
+  } else {
+    errorMessage = String(candidate);
+  }
+
+  return new Error(errorMessage);
+}
