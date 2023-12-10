@@ -7,11 +7,7 @@ npm run dev
 
 [Reactive Recipes](http://localhost:5173)
 
-
-
 https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489d-8965-a6627f61a170
-
-
 
 ## Useful links
 
@@ -23,6 +19,8 @@ https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489
 
 - For an intuition on how to design functional services, read [Domain Modeling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/)
 - For an intuition on what is considered a side effect, and how to compose side effects, watch [Duality and the End of Reactive](https://youtu.be/SVYGmGYXLpY?si=SC6OFZWVsHUSIXEBb)
+- For an introduction to using finite state machines to describe user interfaces, read [Statecharts: a visual formalism for complex systems
+  ](https://www.sciencedirect.com/science/article/pii/0167642387900359)
 
 ## RapidAPI and Tasty
 
@@ -37,74 +35,108 @@ VITE_RAPID_API_KEY=<your api key>
 
 Tasty has a very limited free account, so you may run out of requests quite quickly, use the [RapidAPI Dashboard](https://rapidapi.com/developer/dashboard) to monitor your usage.
 
-## Mutations
+## State
 
-Access to mutation results is global, but each mutation result requires a correlation id to be de-referenced. Using the [useId](https://react.dev/reference/react/useId) hook from within a React component, it is possible to virtually have "private" mutations, local only to the component that triggers them.
-
-> For example, see [RemoveFavorite](src/favorites/RemoveFavorite.tsx).
-
-## Signals and state
-
-Imagine you want to transition between two states: `Idle` and `Engaged` using a `begin` transition:
+Imagine you are working on an application that can be in two states: `Idle` and `Activated`. You can represent such application with a finite state machine:
 
 ```mermaid
 stateDiagram-v2
-direction LR
 
-[*] --> Idle
-Idle --> Engaged: begin
+state State {
+  direction LR
+  [*] --> Idle
+  Idle --> Activated: activate
+  Activated --> Idle: deactivate
+}
 ```
 
-You can use [signals](https://react-rxjs.org/docs/api/utils/createSignal) to represent and compose the transitions between states. If you create a signal:
+Using the state machine as a guide, you can provide an implementation for your application's state by providing:
+
+1. a type definition for the state
+1. a set of transitions that transform the state
+1. a hook that allows React components to consume the state
+
+Begin by defining a type that allows you to represent your state, including all the possible sub-states:
 
 ```typescript
-const [begin$, begin] = createSignal<void>();
+type State = "Idle" | "Activated";
 ```
 
-Then `begin` becomes the public API that allows the user to trigger a state transition, and `begin$` the private API that allows you to compose state transitions with side effects and with other state transitions, to produce a new state of your application, or trigger a side effect in the system.
+Then, use [signals](https://react-rxjs.org/docs/api/utils/createSignal) to represent and compose the transitions between states. If you create a signal:
 
 ```typescript
-type State = "Idle" | "Engaged";
-
-const state$ = begin$.pipe(
-  map(() => "Engaged" as const),
-  startWith("Idle" as const)
-);
+const [activate$, activate] = createSignal<void>();
+const [deactivate$, deactivate] = createSignal<void>();
 ```
+
+`createSignal` returns tuple, with an observable on the first element and a setter function on the second element. Use the observable to compose your application's state, and export the setter as your state transitions public API. In this case, `activate` and `deactivate` become the public API that allows the user to trigger a state transition, and `activate$` and `deactivate$` the private API that allows you to compose state transitions to produce a new state of your application.
+
+For example, this is a possible implementation of our application's state:
+
+```typescript
+const state$ = merge(
+  activate$.pipe(map(() => "Activated" as const)),
+  deactivate$.pipe(map(() => "Idle" as const))
+).pipe(startWith("Idle"));
+```
+
+> Notice that our state transition functions do not carry a value in this case. Arguably we could implement our state
+> transitions with a single signal:
+>
+> `const [transition$, setTransition] = createSignal<State>()`.
+>
+> But we want to highlight the importance of the **meaning** of each state transition. As much as possible, your public
+> API should represent your "ideal" state machine without showing the implementation details.
+>
+> Later on we will show how sometimes it makes sense to carry data along with a state transition.
 
 After that, you can create a hook to allow React components consume the state of your application:
 
 ```typescript
-const [useAppState] = bind(state$);
+const [useAppState, appState$] = bind(state$);
 ```
 
 And finally you can export your public API, which should be your state transitions plus your state hooks:
 
 ```typescript
-export { begin, useAppState };
+export { activate, deactivate, useAppState, appState$ };
 ```
 
-The transitions for [`favorites/state.selection.ts`](src/favorites/state.selection.ts) are composed and transformed to represent the state a selection of favorite recipes, but they don't produce any side effect, apart from rendering.
+> `appState$` is the underlying StateObservable behind the `useAppState` hook. This observable is multicased and shared, an you can use it to compose your state with other observables in other parts of your application. I like to recommend only adding to your public API observables that represents state in your application, and carry meaning in your busines, rather than using the observable returned by signals. This is because signals are implementation details for a concrete state machine, and you may want to change them in the future, while the state should be a stable concept in your business.
 
-The transitions for [`favorites/state.manage.ts`](src/favorites/state.manage.ts) produce side effects that eventually affect the value of the current list of [`Favorite`](src/favorites/service.model.ts) recipes[].
+### Example 1, simple state: managing favorites
 
-The transitions for [`recipes/state.ts`](src/recipes/state.ts) are a mix. First they transform an intermediate state called [`RecipeListRequest`](src/recipes/model.ts). Conceptually this state can be understood as follows:
+```mermaid
+stateDiagram-v2
+direction LR
+
+[*] --> FavoritesSelection
+FavoritesSelection --> FavoritesSelection: addFavorite(recipeId)
+FavoritesSelection --> FavoritesSelection: removeFavorite(favoriteId)
+FavoritesSelection --> FavoritesSelection: bulkRemoveFavorites(favoriteId[])
+FavoritesSelection --> FavoritesSelection: selectAllFavorites
+FavoritesSelection --> FavoritesSelection: clearFavoritesSelection
+```
+
+### Example 2, state with sub states: listing and searching recipes
 
 ```mermaid
 stateDiagram-v2
 
-state RecipeListRequest {
-  [*] --> DefaultSearch
-  DefaultSearch --> DefaultSearch: changeRecipesPage
-  DefaultSearch --> SearchWithQuery: searchRecipes(q != "")
-  SearchWithQuery --> SearchWithQuery: changeRecipesPage
-  SearchWithQuery --> DefaultSearch: searchRecipes(q = "")
+state RecipesRequest {
+  [*] --> ListRecipes
+  ListRecipes --> ListRecipes: nextPage
+  ListRecipes --> ListRecipes: previousPage
+  ListRecipes --> SearchRecipes: searchRecipes(query)
+  SearchRecipes --> SearchRecipes: nextPage
+  SearchRecipes --> SearchRecipes: previousPage
+  SearchRecipes --> ListRecipes: clearSearch
 }
-
-
 ```
 
 That intermediate state represents the arguments for a service call. By composing `RecipeListRequest` with an observable service, we produce [`PaginatedRecipeListResult`](src/recipes/model.ts), which is the final state we want to offer as a public API of our application.
+
+# Remove all this section!
 
 Is worth noting this composition has side effects (errors and network calls), but the result is exposed in the same resulting observable state. This is usually the case with read operations, but more often than not **is not the case with mutations**. As seen before, mutation usually have the common side effects (errors, network calls, asynchronicity), but on top of that their result may affect the emissions of other pieces of observable state.
 
