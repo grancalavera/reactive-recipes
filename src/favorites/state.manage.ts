@@ -1,10 +1,20 @@
 import { bind } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
-import { map, merge, startWith } from "rxjs";
-import { MutationOptions, useMutation } from "../lib/mutation";
+import { firstValueFrom, map, merge, startWith } from "rxjs";
+import { useMutation } from "../lib/mutation";
 import * as service from "./service";
 import { Favorite } from "./service.model";
 
+/**
+ * In this module the public API is defined as a single `export` block at the top of the file. This
+ * makes it easier to very quickly see what conforms the public API, but has the disadvantage of
+ * making it harder to know if a given definition in the module belongs to the public API, you always
+ * need to check in two places. Also it makes it slightly harder to rename API members in VSCode, since
+ * a rename in the definition will not rename the exported definitions, so most of the times you'll need
+ * to run two refactors as opposed to one.
+ *
+ * For an alternative approach see src/favorites/state.selection.ts
+ */
 export {
   favorites$,
   findFavoriteByRecipeId$,
@@ -12,11 +22,11 @@ export {
   useBulkRemoveFavorites,
   useFavorites,
   useFindFavoriteByRecipeId,
+  useIsFavoriteById,
   useIsFavoriteRecipe,
   useIsFavoritesEmpty,
   useIsLoadingFavorites,
   useRemoveFavorite,
-  useIsFavoriteById,
 };
 
 const [useFavorites, favorites$] = bind<Favorite[]>(
@@ -40,20 +50,28 @@ const [useIsFavoriteById] = bind((id: string) =>
 
 const [useIsFavoritesEmpty] = bind(favorites$.pipe(map((_) => _.length === 0)));
 
-const [isLoading$, setLoading] = createSignal<boolean>();
+const [isLoadingBulkOperation$, setLoadingBulkOperation] =
+  createSignal<boolean>();
 
-const mutationOptions: MutationOptions = {
-  onMutationStart: () => setLoading(true),
-};
+const useAddFavorite = () => useMutation(service.postFavorite);
 
-const useAddFavorite = () => useMutation(service.postFavorite, mutationOptions);
-
-const useRemoveFavorite = () =>
-  useMutation(service.deleteFavorite, mutationOptions);
+const useRemoveFavorite = () => useMutation(service.deleteFavorite);
 
 const useBulkRemoveFavorites = () =>
-  useMutation(service.bulkDeleteFavorites, mutationOptions);
+  useMutation(async (batch: string[]) => {
+    setLoadingBulkOperation(true);
+
+    // run the mutation
+    const result = await service.bulkDeleteFavorites(batch);
+    // then wait for the next favorites invalidation
+    await firstValueFrom(favorites$);
+
+    setLoadingBulkOperation(false);
+    return result;
+  });
 
 const [useIsLoadingFavorites] = bind(
-  merge(favorites$.pipe(map(() => false)), isLoading$).pipe(startWith(false))
+  merge(favorites$.pipe(map(() => false)), isLoadingBulkOperation$).pipe(
+    startWith(false)
+  )
 );
