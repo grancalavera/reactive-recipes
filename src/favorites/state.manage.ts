@@ -1,6 +1,6 @@
 import { bind } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
-import { firstValueFrom, map, merge, startWith } from "rxjs";
+import { filter, first, lastValueFrom, map, startWith } from "rxjs";
 import { useMutation } from "../lib/mutation";
 import * as service from "./service";
 import { Favorite } from "./service.model";
@@ -25,7 +25,7 @@ export {
   useIsFavoriteById,
   useIsFavoriteRecipe,
   useIsFavoritesEmpty,
-  useIsLoadingFavorites,
+  useFavoritesBatchInProgress,
   useRemoveFavorite,
 };
 
@@ -50,7 +50,7 @@ const [useIsFavoriteById] = bind((id: string) =>
 
 const [useIsFavoritesEmpty] = bind(favorites$.pipe(map((_) => _.length === 0)));
 
-const [isLoadingBulkOperation$, setLoadingBulkOperation] =
+const [favoritesBatchInProgress$, setFavoritesBatchInProgress] =
   createSignal<boolean>();
 
 const useAddFavorite = () => useMutation(service.postFavorite);
@@ -59,19 +59,27 @@ const useRemoveFavorite = () => useMutation(service.deleteFavorite);
 
 const useBulkRemoveFavorites = () =>
   useMutation(async (batch: string[]) => {
-    setLoadingBulkOperation(true);
+    setFavoritesBatchInProgress(true);
 
     // run the mutation
     const result = await service.bulkDeleteFavorites(batch);
-    // then wait for the next favorites invalidation
-    await firstValueFrom(favorites$);
 
-    setLoadingBulkOperation(false);
+    // then wait for the next favorites invalidation in which the
+    // entire batch has been removed
+    const batchRemoved$ = favorites$.pipe(
+      filter((favorites) =>
+        batch.every((id) => !favorites.some((_) => _.id === id))
+      ),
+      first()
+    );
+
+    // see the difference between `lastValueFrom` and `firstValueFrom` here:
+    // https://rxjs.dev/api/index/function/lastValueFrom
+    // https://rxjs.dev/api/index/function/firstValueFrom
+    await lastValueFrom(batchRemoved$);
+
+    setFavoritesBatchInProgress(false);
     return result;
   });
 
-const [useIsLoadingFavorites] = bind(
-  merge(favorites$.pipe(map(() => false)), isLoadingBulkOperation$).pipe(
-    startWith(false)
-  )
-);
+const [useFavoritesBatchInProgress] = bind(favoritesBatchInProgress$);
