@@ -4,6 +4,7 @@ import { FavoritesList } from "./FavoritesList";
 import { FavoritesBulkLoader } from "./FavoritesBulkLoader";
 import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
+import { FavoriteSelectionStatus } from "./FavoriteSelectionStatus";
 
 export const Favorites = () => (
   <>
@@ -19,6 +20,7 @@ export const Favorites = () => (
       <hr />
       <FavoritesList />
       <hr />
+      <FavoriteSelectionStatus />
     </section>
     <FavoriteSelectionHousekeeper />
   </>

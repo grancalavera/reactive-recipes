@@ -90,18 +90,32 @@ export { activate, deactivate, useAppState, appState$ };
 
 > `appState$` is the underlying StateObservable behind the `useAppState` hook. This observable is multicased and shared, an you can use it to compose your state with other observables in other parts of your application. I like to recommend only adding to your public API observables that represents state in your application, and carry meaning in your busines, rather than using the observable returned by signals. This is because signals are implementation details for a concrete state machine, and you may want to change them in the future, while the state should be a stable concept in your business.
 
-### Example 1, simple state: managing favorites
+### Example 1 simple state: favorite selection
+
+> [favorites/state.selection.ts](./src/favorites/state.selection.ts)
+
+This state manages the selected favorites in the favorites section, without making any changes to them directly. The state is exposed as global states, and different parts of the application can operate over the selection.
+
+![Favorites Selection](./docs/favorite-selection.gif)
+
+The state is represented by a `FavoritesSelection` type, implemented using a [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set). All state transitions start and end in the same state, but the Set can be empty. There's no need to represent the empty set as an independent state.
+
+> [favorites/state.model.ts](./src/favorites/state.model.ts)
 
 ```mermaid
 stateDiagram-v2
-direction LR
+state FavoritesSelection {
+  direction LR
+  s: Set#lt;string#gt;
 
-[*] --> FavoritesSelection
-FavoritesSelection --> FavoritesSelection: addFavorite(recipeId)
-FavoritesSelection --> FavoritesSelection: removeFavorite(favoriteId)
-FavoritesSelection --> FavoritesSelection: bulkRemoveFavorites(favoriteId[])
-FavoritesSelection --> FavoritesSelection: selectAllFavorites
-FavoritesSelection --> FavoritesSelection: clearFavoritesSelection
+  [*] --> s
+  s --> s: selectFavorite(favoriteId)
+  s --> s: deselectFavorite(favoriteId)
+  s --> s: bulkDeselectFavorites(favoriteId[])
+  s --> s: selectAllFavorites
+  s --> s: deselectAllFavorites
+  s --> s: clearFavoritesSelection
+}
 ```
 
 ### Example 2, state with sub states: listing and searching recipes
@@ -111,11 +125,9 @@ stateDiagram-v2
 
 state RecipesRequest {
   [*] --> ListRecipes
-  ListRecipes --> ListRecipes: nextPage
-  ListRecipes --> ListRecipes: previousPage
+  ListRecipes --> ListRecipes: changePage(page)
   ListRecipes --> SearchRecipes: searchRecipes(query)
-  SearchRecipes --> SearchRecipes: nextPage
-  SearchRecipes --> SearchRecipes: previousPage
+  SearchRecipes --> SearchRecipes: changePage(page)
   SearchRecipes --> ListRecipes: clearSearch
 }
 ```

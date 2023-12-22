@@ -69,9 +69,10 @@ export const [useIsFavoriteSelected] = bind((id: string) =>
   state$.pipe(map(model.isFavoriteSelected(id)))
 );
 
-export const [useFavoriteSelection, selection$] = bind(
+const [useFavoriteSelection, selection$] = bind(
   state$.pipe(map((selection) => [...selection]))
 );
+export { useFavoriteSelection };
 
 export const [useZombieFavoriteSelection] = bind(
   combineLatest([selection$, favorites$]).pipe(
