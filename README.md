@@ -120,19 +120,29 @@ state FavoritesSelection {
 
 ### Example 2, state with sub states: listing and searching recipes
 
+`RecipeListRequest` is an intermediate state that represents the arguments for a service call. By composing the resulting`Observable<RecipeListRequest>` with an observable service, we produce [`RecipeListResponse`](src/recipes/model.ts), which is the final state we want to offer as a public API of our application.
+
+![Listing and searching recipes](./docs/list-recipes.gif)
+
 ```mermaid
 stateDiagram-v2
+direction LR
 
-state RecipesRequest {
+RecipeListRequest --> RecipeListResponse: next
+
+state RecipeListRequest {
   [*] --> ListRecipes
   ListRecipes --> ListRecipes: changePage(page)
   ListRecipes --> SearchRecipes: searchRecipes(query)
   SearchRecipes --> SearchRecipes: changePage(page)
   SearchRecipes --> ListRecipes: clearSearch
 }
-```
 
-That intermediate state represents the arguments for a service call. By composing `RecipeListRequest` with an observable service, we produce [`PaginatedRecipeListResult`](src/recipes/model.ts), which is the final state we want to offer as a public API of our application.
+state RecipeListResponse {
+ [*] --> Response: GET(RecipesRequest)
+ Response --> [*]
+}
+```
 
 # Remove all this section!
 

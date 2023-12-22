@@ -3,7 +3,7 @@ import { fromFetch } from "rxjs/fetch";
 import { httpErrorFromResponse } from "../lib/errors";
 import {
   RecipeListRequest,
-  RecipeListResult,
+  RecipeListResponse,
   recipeListResultSchema,
 } from "./model";
 
@@ -11,7 +11,7 @@ const endpoint = "/api/recipes";
 
 export const recipeList$ = (
   request: RecipeListRequest
-): Observable<RecipeListResult> => {
+): Observable<RecipeListResponse> => {
   const params = Object.entries(request)
     .filter(([, value]) => value !== undefined)
     .map(([key, value]) => [key, value.toString()]);

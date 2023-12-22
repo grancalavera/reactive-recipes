@@ -9,7 +9,7 @@ import {
   switchMap,
 } from "rxjs";
 import { assertNever } from "../lib/assertNever";
-import { Page, defaultRequest } from "./model";
+import { Page, changePage, clearSearch, defaultRequest, search } from "./model";
 import * as service from "./service";
 
 export {
@@ -29,15 +29,13 @@ const request$ = state(
     scan((state, signal) => {
       switch (signal.type) {
         case "changePage$": {
-          return { ...state, ...signal.payload };
+          return changePage(state, signal.payload);
         }
         case "search$": {
-          return state.q === signal.payload
-            ? state
-            : { ...state, q: signal.payload, _page: 1 };
+          return search(state, signal.payload);
         }
         case "clearSearch$": {
-          return !state.q ? state : { ...state, q: undefined };
+          return clearSearch(state);
         }
         default: {
           assertNever(signal);

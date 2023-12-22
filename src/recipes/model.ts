@@ -1,8 +1,35 @@
 import { z } from "zod";
 
-export type RecipeListRequest = Page & {
-  q?: string;
+export type RecipeListRequest = ListRecipes | SearchRecipes;
+
+type ListRecipes = Page;
+
+type SearchRecipes = Page & {
+  q: string;
 };
+
+const isSearchRequest = (
+  request: RecipeListRequest
+): request is SearchRecipes => (request as SearchRecipes).q !== undefined;
+
+export const changePage = (
+  request: RecipeListRequest,
+  page: Page
+): RecipeListRequest =>
+  request._page === page._page && request._limit === page._limit
+    ? request
+    : { ...request, ...page };
+
+export const search = (
+  request: RecipeListRequest,
+  q: string
+): RecipeListRequest =>
+  isSearchRequest(request) && request.q === q
+    ? request
+    : { ...defaultRequest, q };
+
+export const clearSearch = (request: RecipeListRequest): RecipeListRequest =>
+  isSearchRequest(request) ? defaultRequest : request;
 
 const recipeSchema = z.object({
   id: z.number(),
@@ -33,7 +60,7 @@ export type Recipe = z.infer<typeof recipeSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;
 export type Page = z.infer<typeof pageSchema>;
 
-export type RecipeListResult = z.infer<typeof recipeListResultSchema>;
+export type RecipeListResponse = z.infer<typeof recipeListResultSchema>;
 
 export const defaultRequest: RecipeListRequest = {
   _page: 1,
