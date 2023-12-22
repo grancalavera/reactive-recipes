@@ -2,31 +2,29 @@ import { Observable, map, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
 import { httpErrorFromResponse } from "../lib/errors";
 import {
-  PaginatedRecipeListResult,
   RecipeListRequest,
+  RecipeListResult,
   recipeListResultSchema,
 } from "./model";
 
 const endpoint = "/api/recipes";
 
 export const recipeList$ = (
-  _request: RecipeListRequest
-): Observable<PaginatedRecipeListResult> => {
-  // const params = Object.entries(request).map(([key, value]) => [
-  //   key,
-  //   value.toString(),
-  // ]);
+  request: RecipeListRequest
+): Observable<RecipeListResult> => {
+  const params = Object.entries(request)
+    .filter(([, value]) => value !== undefined)
+    .map(([key, value]) => [key, value.toString()]);
 
-  return fromFetch(
-    `${endpoint}?${new URLSearchParams({ _page: "10", _limit: "5" })}`
-  ).pipe(
+  return fromFetch(`${endpoint}?${new URLSearchParams(params)}`).pipe(
     switchMap(async (response) => {
       if (!response.ok) {
         throw httpErrorFromResponse(response);
       }
       const results = await response.json();
       return {
-        page: { _page: 10, _limit: 5 },
+        _page: request._page,
+        _limit: request._limit,
         results,
         pagination: parsePagination(response),
         count: parseInt(response.headers.get("x-total-count") ?? "0"),

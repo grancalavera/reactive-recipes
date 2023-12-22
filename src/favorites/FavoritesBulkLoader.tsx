@@ -3,5 +3,9 @@ import { useFavoritesBatchInProgress } from "./state.manage";
 
 export const FavoritesBulkLoader = () => {
   const isLoading = useFavoritesBatchInProgress();
-  return isLoading ? <LoadingAnimation /> : null;
+  return isLoading ? (
+    <small>
+      <LoadingAnimation />
+    </small>
+  ) : null;
 };

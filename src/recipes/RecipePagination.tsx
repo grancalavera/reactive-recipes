@@ -1,32 +1,33 @@
-import { useIsLoadingRecipes, useRecipeList } from "./state";
+import { Page } from "./model";
+import { changeRecipesPage, useIsLoadingRecipes, useRecipeList } from "./state";
 
 export const RecipePagination = () => {
-  const { pagination, page } = useRecipeList();
   const isLoading = useIsLoadingRecipes();
 
-  const pageCount = pagination.last._page;
-  const currentPage = page._page;
+  const { pagination, _page } = useRecipeList();
+  const pageCount = pagination.last?._page ?? 1;
+
+  const createPageChanger = (page: Page | undefined) => () => {
+    if (!page) return;
+    changeRecipesPage(page);
+  };
 
   return (
     <div className="pagination">
       <button
         className="icon-button"
         disabled={pagination.prev === undefined || isLoading}
-        onClick={() => {
-          // changeRecipesPage(pagination.prevFrom);
-        }}
+        onClick={createPageChanger(pagination.prev)}
       >
         ⬅️
       </button>
       <small>
-        page {currentPage} of {pageCount}
+        page {_page} of {pageCount}
       </small>
       <button
         className="icon-button"
         disabled={pagination.next === undefined || isLoading}
-        onClick={() => {
-          // changeRecipesPage(pagination.nextFrom);
-        }}
+        onClick={createPageChanger(pagination.next)}
       >
         ➡️
       </button>

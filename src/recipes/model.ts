@@ -15,15 +15,16 @@ const pageSchema = z.object({
 });
 
 const paginationSchema = z.object({
-  first: pageSchema,
+  first: pageSchema.optional(),
+  last: pageSchema.optional(),
   prev: pageSchema.optional(),
   next: pageSchema.optional(),
-  last: pageSchema,
 });
 
 export const recipeListResultSchema = z.object({
   count: z.number(),
-  page: pageSchema,
+  _page: z.number(),
+  _limit: z.number(),
   pagination: paginationSchema,
   results: recipeSchema.array(),
 });
@@ -33,10 +34,6 @@ export type Pagination = z.infer<typeof paginationSchema>;
 export type Page = z.infer<typeof pageSchema>;
 
 export type RecipeListResult = z.infer<typeof recipeListResultSchema>;
-
-export type PaginatedRecipeListResult = RecipeListResult & {
-  pagination: Pagination;
-};
 
 export const defaultRequest: RecipeListRequest = {
   _page: 1,

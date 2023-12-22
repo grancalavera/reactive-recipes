@@ -9,10 +9,18 @@ import {
   switchMap,
 } from "rxjs";
 import { assertNever } from "../lib/assertNever";
-import { defaultRequest } from "./model";
+import { Page, defaultRequest } from "./model";
 import * as service from "./service";
 
-const [changePage$, changeRecipesPage] = createSignal<number | undefined>();
+export {
+  changeRecipesPage,
+  clearRecipesSearch,
+  searchRecipes,
+  useIsLoadingRecipes,
+  useRecipeList,
+};
+
+const [changePage$, changeRecipesPage] = createSignal<Page>();
 const [search$, searchRecipes] = createSignal<string>();
 const [clearSearch$, clearRecipesSearch] = createSignal();
 
@@ -21,13 +29,12 @@ const request$ = state(
     scan((state, signal) => {
       switch (signal.type) {
         case "changePage$": {
-          // return { ...state, from: signal.payload ?? state.from };
-          return state;
+          return { ...state, ...signal.payload };
         }
         case "search$": {
           return state.q === signal.payload
             ? state
-            : { ...state, q: signal.payload, from: 0 };
+            : { ...state, q: signal.payload, _page: 1 };
         }
         case "clearSearch$": {
           return !state.q ? state : { ...state, q: undefined };
@@ -49,11 +56,3 @@ const [useRecipeList, recipes$] = bind(
 const [useIsLoadingRecipes] = bind(
   merge(recipes$.pipe(map(() => false)), request$.pipe(map(() => true)))
 );
-
-export {
-  changeRecipesPage,
-  clearRecipesSearch,
-  searchRecipes,
-  useIsLoadingRecipes,
-  useRecipeList,
-};

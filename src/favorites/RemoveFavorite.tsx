@@ -1,3 +1,4 @@
+import { LoadingAnimation } from "../components/LoadingAnimation";
 import { isLoading, isSuccess } from "../lib/result";
 import { useIsFavoriteById, useRemoveFavorite } from "./state.manage";
 
@@ -12,7 +13,7 @@ export const RemoveFavorite = ({ id }: { id: string }) => {
       disabled={loading}
       onClick={() => mutate(id)}
     >
-      ★
+      {loading ? <LoadingAnimation /> : "★"}
     </button>
   );
 };

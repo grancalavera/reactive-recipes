@@ -13,7 +13,6 @@ https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489
 
 - [json-server](https://github.com/typicode/json-server)
 - [concurrently](https://github.com/open-cli-tools/concurrently)
-- [RapidAPI](https://rapidapi.com)
 
 ## Reference Material
 
@@ -21,19 +20,6 @@ https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489
 - For an intuition on what is considered a side effect, and how to compose side effects, watch [Duality and the End of Reactive](https://youtu.be/SVYGmGYXLpY?si=SC6OFZWVsHUSIXEBb)
 - For an introduction to using finite state machines to describe user interfaces, read [Statecharts: a visual formalism for complex systems
   ](https://www.sciencedirect.com/science/article/pii/0167642387900359)
-
-## RapidAPI and Tasty
-
-You need to create a [RapidAPI](https://rapidapi.com) account and subscribe to the [tasty](https://rapidapi.com/apidojo/api/tasty) API.
-
-Create an `.env.local` file at the root of the project and add following fields:
-
-```bash
-VITE_RAPID_API_HOST=tasty.p.rapidapi.com
-VITE_RAPID_API_KEY=<your api key>
-```
-
-Tasty has a very limited free account, so you may run out of requests quite quickly, use the [RapidAPI Dashboard](https://rapidapi.com/developer/dashboard) to monitor your usage.
 
 ## State
 
