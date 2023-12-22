@@ -1,53 +1,36 @@
 import { z } from "zod";
 
-export type RecipeListRequest = {
-  from: number;
-  size: number;
+export type RecipeListRequest = Page & {
   q?: string;
 };
-
-export type Page = {
-  from: number;
-  size: number;
-};
-
-export type Pagination = {
-  size: number;
-  from: number;
-  nextFrom?: number;
-  prevFrom?: number;
-};
-
-export const getPagination = (
-  request: RecipeListRequest,
-  count: number
-): Pagination => {
-  const nextFrom = request.from + request.size;
-  const prevFrom = request.from - request.size;
-
-  const pagination: Pagination = { size: request.size, from: request.from };
-  if (nextFrom < count) pagination.nextFrom = nextFrom;
-  if (prevFrom > -1) pagination.prevFrom = prevFrom;
-
-  return pagination;
-};
-
-const instructionStep = z.object({
-  display_text: z.string(),
-});
 
 const recipeSchema = z.object({
   id: z.number(),
   name: z.string(),
 });
 
+const pageSchema = z.object({
+  _page: z.number(),
+  _limit: z.number(),
+});
+
+const paginationSchema = z.object({
+  first: pageSchema,
+  prev: pageSchema.optional(),
+  next: pageSchema.optional(),
+  last: pageSchema,
+});
+
 export const recipeListResultSchema = z.object({
   count: z.number(),
+  page: pageSchema,
+  pagination: paginationSchema,
   results: recipeSchema.array(),
 });
 
 export type Recipe = z.infer<typeof recipeSchema>;
-export type InstructionStep = z.infer<typeof instructionStep>;
+export type Pagination = z.infer<typeof paginationSchema>;
+export type Page = z.infer<typeof pageSchema>;
 
 export type RecipeListResult = z.infer<typeof recipeListResultSchema>;
 
@@ -55,4 +38,7 @@ export type PaginatedRecipeListResult = RecipeListResult & {
   pagination: Pagination;
 };
 
-export const defaultRequest: RecipeListRequest = { from: 0, size: 10 };
+export const defaultRequest: RecipeListRequest = {
+  _page: 1,
+  _limit: 5,
+};

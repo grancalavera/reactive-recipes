@@ -21,11 +21,11 @@ export {
   useAddFavorite,
   useBulkRemoveFavorites,
   useFavorites,
+  useFavoritesRemovalInProgress as useFavoritesBatchInProgress,
   useFindFavoriteByRecipeId,
   useIsFavoriteById,
   useIsFavoriteRecipe,
   useIsFavoritesEmpty,
-  useFavoritesBatchInProgress,
   useRemoveFavorite,
 };
 
@@ -36,7 +36,7 @@ const [useFavorites, favorites$] = bind<Favorite[]>(
 const [useFindFavoriteByRecipeId, findFavoriteByRecipeId$] = bind(
   (recipeId: number) =>
     favorites$.pipe(
-      map((favorites) => favorites.find((_) => _.recipeId === recipeId))
+      map((favorites) => favorites.find((x) => x.recipeId === recipeId))
     )
 );
 
@@ -45,12 +45,12 @@ const [useIsFavoriteRecipe] = bind((recipeId: number) =>
 );
 
 const [useIsFavoriteById] = bind((id: string) =>
-  favorites$.pipe(map((favorites) => favorites.some((_) => _.id === id)))
+  favorites$.pipe(map((favorites) => favorites.some((x) => x.id === id)))
 );
 
-const [useIsFavoritesEmpty] = bind(favorites$.pipe(map((_) => _.length === 0)));
+const [useIsFavoritesEmpty] = bind(favorites$.pipe(map((x) => x.length === 0)));
 
-const [favoritesBatchInProgress$, setFavoritesBatchInProgress] =
+const [favoritesRemovalInProgress$, toggleFavoritesRemovalInProgress] =
   createSignal<boolean>();
 
 const useAddFavorite = () => useMutation(service.postFavorite);
@@ -59,27 +59,29 @@ const useRemoveFavorite = () => useMutation(service.deleteFavorite);
 
 const useBulkRemoveFavorites = () =>
   useMutation(async (batch: string[]) => {
-    setFavoritesBatchInProgress(true);
+    toggleFavoritesRemovalInProgress(true);
 
-    // run the mutation
+    // run the mutation and wait for the result
     const result = await service.bulkDeleteFavorites(batch);
 
     // then wait for the next favorites invalidation in which the
     // entire batch has been removed
-    const batchRemoved$ = favorites$.pipe(
-      filter((favorites) =>
-        batch.every((id) => !favorites.some((_) => _.id === id))
-      ),
-      first()
-    );
-
     // see the difference between `lastValueFrom` and `firstValueFrom` here:
     // https://rxjs.dev/api/index/function/lastValueFrom
     // https://rxjs.dev/api/index/function/firstValueFrom
-    await lastValueFrom(batchRemoved$);
+    await lastValueFrom(
+      favorites$.pipe(
+        filter((favorites) =>
+          batch.every((id) => !favorites.some((x) => x.id === id))
+        ),
+        first()
+      )
+    );
 
-    setFavoritesBatchInProgress(false);
+    toggleFavoritesRemovalInProgress(false);
     return result;
   });
 
-const [useFavoritesBatchInProgress] = bind(favoritesBatchInProgress$);
+const [useFavoritesRemovalInProgress] = bind(
+  favoritesRemovalInProgress$.pipe(startWith(false))
+);

@@ -21,7 +21,8 @@ const request$ = state(
     scan((state, signal) => {
       switch (signal.type) {
         case "changePage$": {
-          return { ...state, from: signal.payload ?? state.from };
+          // return { ...state, from: signal.payload ?? state.from };
+          return state;
         }
         case "search$": {
           return state.q === signal.payload

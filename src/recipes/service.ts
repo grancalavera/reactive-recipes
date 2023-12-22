@@ -4,40 +4,60 @@ import { httpErrorFromResponse } from "../lib/errors";
 import {
   PaginatedRecipeListResult,
   RecipeListRequest,
-  getPagination,
   recipeListResultSchema,
 } from "./model";
 
-const apiKey = import.meta.env.VITE_RAPID_API_KEY;
-const apiHost = import.meta.env.VITE_RAPID_API_HOST;
-const url = new URL(`https://${apiHost}/recipes/list`);
+const endpoint = "/api/recipes";
 
 export const recipeList$ = (
-  request: RecipeListRequest
+  _request: RecipeListRequest
 ): Observable<PaginatedRecipeListResult> => {
-  const params = Object.entries(request).map(([key, value]) => [
-    key,
-    value.toString(),
-  ]);
+  // const params = Object.entries(request).map(([key, value]) => [
+  //   key,
+  //   value.toString(),
+  // ]);
 
-  return fromFetch(`${url}?${new URLSearchParams(params)}`, {
-    headers: {
-      "X-RapidAPI-Key": apiKey,
-      "X-RapidAPI-Host": apiHost,
-    },
-  }).pipe(
-    switchMap((response) => {
+  return fromFetch(
+    `${endpoint}?${new URLSearchParams({ _page: "10", _limit: "5" })}`
+  ).pipe(
+    switchMap(async (response) => {
       if (!response.ok) {
         throw httpErrorFromResponse(response);
       }
-      return response.json();
-    }),
-    map((data) => {
-      const parsed = recipeListResultSchema.parse(data);
+      const results = await response.json();
       return {
-        ...parsed,
-        pagination: getPagination(request, parsed.count),
+        page: { _page: 10, _limit: 5 },
+        results,
+        pagination: parsePagination(response),
+        count: parseInt(response.headers.get("x-total-count") ?? "0"),
       };
-    })
+    }),
+    map((data) => recipeListResultSchema.parse(data))
   );
+};
+
+const parsePagination = (response: Response): unknown => {
+  try {
+    return Object.fromEntries(
+      response.headers
+        .get("link")
+        ?.split(",")
+        .map((x) => x.split(";"))
+        .map(([link, rel]) => {
+          const url = new URL(
+            link?.trim().replace("<", "").replace(">", "") ?? ""
+          );
+
+          return [
+            rel?.trim().replace('rel="', "").replace('"', "") ?? "",
+            {
+              _page: parseInt(url.searchParams.get("_page") ?? ""),
+              _limit: parseInt(url.searchParams.get("_limit") ?? ""),
+            },
+          ];
+        }) ?? []
+    );
+  } catch {
+    return {};
+  }
 };
