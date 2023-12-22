@@ -37,5 +37,5 @@ export type RecipeListResult = z.infer<typeof recipeListResultSchema>;
 
 export const defaultRequest: RecipeListRequest = {
   _page: 1,
-  _limit: 5,
+  _limit: 12,
 };

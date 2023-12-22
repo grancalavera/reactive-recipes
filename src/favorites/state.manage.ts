@@ -53,34 +53,46 @@ const [useIsFavoritesEmpty] = bind(favorites$.pipe(map((x) => x.length === 0)));
 const [favoritesRemovalInProgress$, toggleFavoritesRemovalInProgress] =
   createSignal<boolean>();
 
+// Sometimes it might be required to perform side effects around a mutation. While it's possible to
+// add specialized callbacks to the mutation constructor hook, a much simpler approach is to just
+// wrap the mutation function itself into another function that performs any arbitrary side effects,
+// while still retaining the same signature as the original function.
+const bulkDeleteFavoritesWithSideEffects = async (
+  batch: string[]
+): Promise<string[]> => {
+  // perform a side effect: show loader
+  toggleFavoritesRemovalInProgress(true);
+
+  // run the mutation and wait for the result
+  const result = await service.bulkDeleteFavorites(batch);
+
+  // perform a side effect: wait for the next favorites invalidation
+  // in which the entire batch has been removed
+  // see the difference between `lastValueFrom` and `firstValueFrom` here:
+  // https://rxjs.dev/api/index/function/lastValueFrom
+  // https://rxjs.dev/api/index/function/firstValueFrom
+  await lastValueFrom(
+    favorites$.pipe(
+      filter((favorites) =>
+        batch.every((id) => !favorites.some((x) => x.id === id))
+      ),
+      first()
+    )
+  );
+
+  // perform a side effect: hide loader
+  toggleFavoritesRemovalInProgress(false);
+
+  // return the mutation result
+  return result;
+};
+
 const useAddFavorite = () => useMutation(service.postFavorite);
 
 const useRemoveFavorite = () => useMutation(service.deleteFavorite);
 
 const useBulkRemoveFavorites = () =>
-  useMutation(async (batch: string[]) => {
-    toggleFavoritesRemovalInProgress(true);
-
-    // run the mutation and wait for the result
-    const result = await service.bulkDeleteFavorites(batch);
-
-    // then wait for the next favorites invalidation in which the
-    // entire batch has been removed
-    // see the difference between `lastValueFrom` and `firstValueFrom` here:
-    // https://rxjs.dev/api/index/function/lastValueFrom
-    // https://rxjs.dev/api/index/function/firstValueFrom
-    await lastValueFrom(
-      favorites$.pipe(
-        filter((favorites) =>
-          batch.every((id) => !favorites.some((x) => x.id === id))
-        ),
-        first()
-      )
-    );
-
-    toggleFavoritesRemovalInProgress(false);
-    return result;
-  });
+  useMutation(bulkDeleteFavoritesWithSideEffects);
 
 const [useFavoritesRemovalInProgress] = bind(
   favoritesRemovalInProgress$.pipe(startWith(false))

@@ -3,5 +3,9 @@ import { useIsLoadingRecipes } from "./state";
 
 export const RecipeLoader = () => {
   const isLoading = useIsLoadingRecipes();
-  return isLoading ? <LoadingAnimation /> : null;
+  return isLoading ? (
+    <small>
+      <LoadingAnimation />
+    </small>
+  ) : null;
 };
