@@ -24,7 +24,10 @@ export const RemoveFavoriteSelection = () => {
     <button
       className="icon-button"
       disabled={!enabled}
-      onClick={() => mutate(selection)}
+      onClick={() => {
+        console.log("RemoveFavoriteSelection: onClick");
+        mutate(selection);
+      }}
     >
       🗑️
     </button>

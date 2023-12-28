@@ -40,10 +40,6 @@ export const isFavoriteSelected =
 export const isFavoritesSelectionEmpty = (selection: FavoritesSelection) =>
   selection.size === 0;
 
-export const selectionToArray = (selection: FavoritesSelection) => [
-  ...selection,
-];
-
 export const zombieFavoritesSelection = (
   selection: string[],
   favorites: Favorite[]

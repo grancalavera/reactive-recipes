@@ -10,5 +10,5 @@ const [useLoader] = bind(loader$);
 
 export const LoadingAnimation = () => {
   const loader = useLoader();
-  return <small>{loader}</small>;
+  return <span>{loader}</span>;
 };

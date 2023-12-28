@@ -1,3 +1,4 @@
+import { LoadingAnimation } from "../components/LoadingAnimation";
 import { isLoading, isSuccess } from "../lib/result";
 import { Recipe } from "../recipes/model";
 import { useAddFavorite, useIsFavoriteRecipe } from "./state.manage";
@@ -13,7 +14,7 @@ export const AddFavorite = ({ recipe }: { recipe: Recipe }) => {
       disabled={loading}
       onClick={() => mutate({ recipeId: recipe.id, recipeName: recipe.name })}
     >
-      ☆
+      {loading ? <LoadingAnimation /> : "☆"}
     </button>
   );
 };

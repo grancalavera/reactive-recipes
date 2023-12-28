@@ -1,8 +1,8 @@
 import { LoadingAnimation } from "../components/LoadingAnimation";
-import { useIsLoadingRecipes } from "./state";
+import { useFavoritesBatchInProgress } from "./state.manage";
 
-export const RecipeLoader = () => {
-  const isLoading = useIsLoadingRecipes();
+export const FavoritesBulkLoader = () => {
+  const isLoading = useFavoritesBatchInProgress();
   return isLoading ? (
     <small>
       <LoadingAnimation />

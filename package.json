@@ -10,7 +10,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "create-db": "echo '{\"favorites\":[]}' > db.json",
+    "create-db": "cp db-seed.json db.json",
     "t": "tsc"
   },
   "dependencies": {
