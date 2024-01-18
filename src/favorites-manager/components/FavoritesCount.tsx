@@ -1,4 +1,4 @@
-import { useFavorites } from "./state.manage";
+import { useFavorites } from "../../favorites/state";
 
 export const FavoritesCount = () => {
   const favorites = useFavorites();

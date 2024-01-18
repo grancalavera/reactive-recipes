@@ -1,8 +1,8 @@
 import { Subscribe } from "@react-rxjs/core";
 import { ToastContainer } from "react-toastify";
 import { Layout } from "./components/Layout";
-import { Favorites } from "./favorites/Favorites";
-import { Recipes } from "./recipes/Recipes";
+import { FavoritesManager } from "./favorites-manager/components/FavoritesManager";
+import { Recipes } from "./recipes/components/Recipes";
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -10,7 +10,7 @@ function App() {
   return (
     <>
       <Subscribe>
-        <Layout sidebar={<Favorites />} content={<Recipes />} />
+        <Layout sidebar={<FavoritesManager />} content={<Recipes />} />
       </Subscribe>
       <ToastContainer autoClose={800} />
     </>

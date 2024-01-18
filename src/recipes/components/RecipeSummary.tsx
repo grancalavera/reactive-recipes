@@ -1,7 +1,7 @@
-import { AddFavorite } from "../favorites/AddFavorite";
-import { RemoveFavorite } from "../favorites/RemoveFavorite";
-import { useFindFavoriteByRecipeId } from "../favorites/state.manage";
-import { Recipe } from "./model";
+import { AddFavorite } from "../../favorites/components/AddFavorite";
+import { RemoveFavorite } from "../../favorites/components/RemoveFavorite";
+import { useFindFavoriteByRecipeId } from "../../favorites/state";
+import { Recipe } from "../model";
 
 export const RecipeSummary = ({ recipe }: { recipe: Recipe }) => {
   const maybeFavorite = useFindFavoriteByRecipeId(recipe.id);

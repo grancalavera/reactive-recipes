@@ -1,7 +1,7 @@
-import { LoadingAnimation } from "../components/LoadingAnimation";
-import { isLoading, isSuccess } from "../lib/result";
-import { Recipe } from "../recipes/model";
-import { useAddFavorite, useIsFavoriteRecipe } from "./state.manage";
+import { LoadingAnimation } from "../../components/LoadingAnimation";
+import { isLoading, isSuccess } from "../../lib/result";
+import { Recipe } from "../../recipes/model";
+import { useAddFavorite, useIsFavoriteRecipe } from "../state";
 
 export const AddFavorite = ({ recipe }: { recipe: Recipe }) => {
   const { mutate, result } = useAddFavorite();

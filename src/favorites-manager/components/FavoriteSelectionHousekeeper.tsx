@@ -1,8 +1,5 @@
 import { useEffect } from "react";
-import {
-  bulkDeselectFavorites,
-  useZombieFavoriteSelection,
-} from "./state.selection";
+import { bulkDeselectFavorites, useZombieFavoriteSelection } from "../state";
 
 export const FavoriteSelectionHousekeeper = () => {
   const zombies = useZombieFavoriteSelection();

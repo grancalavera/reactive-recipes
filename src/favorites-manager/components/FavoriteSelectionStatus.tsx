@@ -1,4 +1,4 @@
-import { useFavoriteSelection } from "./state.selection";
+import { useFavoriteSelection } from "../state";
 
 export const FavoriteSelectionStatus = () => {
   const count = useFavoriteSelection().length;

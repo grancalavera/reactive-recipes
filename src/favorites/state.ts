@@ -3,7 +3,7 @@ import { createSignal } from "@react-rxjs/utils";
 import { filter, first, lastValueFrom, map, startWith } from "rxjs";
 import { useMutation } from "../lib/mutation";
 import * as service from "./service";
-import { Favorite } from "./service.model";
+import { Favorite } from "./model";
 
 /**
  * In this module the public API is defined as a single `export` block at the top of the file. This

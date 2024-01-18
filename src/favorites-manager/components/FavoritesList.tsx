@@ -1,5 +1,5 @@
 import { FavoriteSummary } from "./FavoriteSummary";
-import { useFavorites } from "./state.manage";
+import { useFavorites } from "../../favorites/state";
 
 export const FavoritesList = () => {
   const favorites = useFavorites();

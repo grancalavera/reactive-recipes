@@ -3,7 +3,7 @@ import {
   useIsLoadingRecipes,
   searchRecipes,
   clearRecipesSearch,
-} from "./state";
+} from "../state";
 
 export const RecipeSearch = () => {
   const [query, setQuery] = useState("");

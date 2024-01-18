@@ -1,5 +1,9 @@
-import { Page } from "./model";
-import { changeRecipesPage, useIsLoadingRecipes, useRecipeList } from "./state";
+import { Page } from "../model";
+import {
+  changeRecipesPage,
+  useIsLoadingRecipes,
+  useRecipeList,
+} from "../state";
 
 export const RecipePagination = () => {
   const isLoading = useIsLoadingRecipes();

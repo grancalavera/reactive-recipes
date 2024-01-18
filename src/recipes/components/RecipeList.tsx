@@ -1,6 +1,6 @@
 import { RecipeLoader } from "./RecipeLoader";
 import { RecipeSummary } from "./RecipeSummary";
-import { useIsLoadingRecipes, useRecipeList } from "./state";
+import { useIsLoadingRecipes, useRecipeList } from "../state";
 
 export const RecipeList = () => {
   const { results } = useRecipeList();

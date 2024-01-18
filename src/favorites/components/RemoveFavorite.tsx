@@ -1,6 +1,6 @@
-import { LoadingAnimation } from "../components/LoadingAnimation";
-import { isLoading, isSuccess } from "../lib/result";
-import { useIsFavoriteById, useRemoveFavorite } from "./state.manage";
+import { LoadingAnimation } from "../../components/LoadingAnimation";
+import { isLoading, isSuccess } from "../../lib/result";
+import { useIsFavoriteById, useRemoveFavorite } from "../state";
 
 export const RemoveFavorite = ({ id }: { id: string }) => {
   const { result, mutate } = useRemoveFavorite();
