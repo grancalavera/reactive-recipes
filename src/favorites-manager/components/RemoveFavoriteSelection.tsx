@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { isIdle, isSuccess } from "../lib/result";
-import { useBulkRemoveFavorites } from "./state.manage";
-import { useFavoriteSelection } from "./state.selection";
+import { isIdle, isSuccess } from "../../lib/result";
+import { useBulkRemoveFavorites } from "../../favorites/state";
+import { useFavoriteSelection } from "../state";
 import { toast } from "react-toastify";
 
 export const RemoveFavoriteSelection = () => {

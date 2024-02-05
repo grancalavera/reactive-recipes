@@ -2,8 +2,8 @@ import { bind, state } from "@react-rxjs/core";
 import { createSignal, mergeWithKey } from "@react-rxjs/utils";
 import { combineLatest, first, map, scan, startWith, switchMap } from "rxjs";
 import { assertNever } from "../lib/assertNever";
-import { favorites$ } from "./state.manage";
-import * as model from "./state.model";
+import { favorites$ } from "../favorites/state";
+import * as model from "./model";
 
 /**
  * In this module the public API members are exported "in situ", as close as possible to their definition.
@@ -51,7 +51,6 @@ const state$ = state(signal$).pipe(
         return model.bulkDeselectFavorites(selection, signal.payload);
       }
       case "deselectAll$": {
-        console.log("ok?");
         return new Set();
       }
       case "selectAll$": {

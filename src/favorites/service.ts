@@ -1,7 +1,7 @@
 import { Subject, concat, debounceTime, firstValueFrom, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
 import { HttpError, httpErrorFromResponse } from "../lib/errors";
-import { Favorite, createFavorite } from "./service.model";
+import { Favorite, createFavorite } from "./model";
 
 const endpoint = "/api/favorites";
 const invalidate$ = new Subject<void>();

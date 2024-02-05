@@ -1,10 +1,10 @@
-import { RemoveFavorite } from "./RemoveFavorite";
-import { Favorite } from "./service.model";
+import { RemoveFavorite } from "../../favorites/components/RemoveFavorite";
+import { Favorite } from "../../favorites/model";
 import {
   deselectFavorite,
   selectFavorite,
   useIsFavoriteSelected,
-} from "./state.selection";
+} from "../state";
 
 export const FavoriteSummary = ({ favorite }: { favorite: Favorite }) => {
   const selected = useIsFavoriteSelected(favorite.id);

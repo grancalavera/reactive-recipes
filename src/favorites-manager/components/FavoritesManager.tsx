@@ -6,7 +6,7 @@ import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
 import { FavoriteSelectionStatus } from "./FavoriteSelectionStatus";
 
-export const Favorites = () => (
+export const FavoritesManager = () => (
   <>
     <section style={{ position: "relative" }}>
       <h3>

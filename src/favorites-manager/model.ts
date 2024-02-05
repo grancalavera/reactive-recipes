@@ -1,4 +1,4 @@
-import { Favorite } from "./service.model";
+import { Favorite } from "../favorites/model";
 
 export type FavoritesSelection = Set<string>;
 export const emptySelection: FavoritesSelection = new Set();
