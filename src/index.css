@@ -29,6 +29,15 @@ ul .icon-button {
   background-color: gainsboro;
 }
 
+body.dark {
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+}
+
+body.dark .sidebar {
+  background-color: black;
+}
+
 .content,
 .sidebar {
   padding: 20px;
@@ -67,7 +76,7 @@ h3 > small {
 }
 
 .plain-button:disabled {
-  color: #d3d3d3;
+  color: #eeeeee;
 }
 
 .input-with-clear {

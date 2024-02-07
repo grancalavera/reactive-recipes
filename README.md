@@ -19,104 +19,91 @@ https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489
 - For an intuition on what is considered a side effect, and how to compose side effects, watch [Duality and the End of Reactive](https://youtu.be/SVYGmGYXLpY?si=SC6OFZWVsHUSIXEBb)
 - For an introduction to using finite state machines to describe user interfaces, read [Statecharts: a visual formalism for complex systems](https://www.sciencedirect.com/science/article/pii/0167642387900359)
 
-## State
+## State: A Simple Example
 
-Imagine you are working on an application that can be in two states: `Idle` and `Activated`. You can represent such application with a finite state machine:
+We're introducing the notion of state in the context of managing an application's theme. Our application must support two themes: _light_ and _dark_, a single operation to toggle between them, as well as providing a way to read the current theme. This is one of the ways to model such state:
 
 ```mermaid
 stateDiagram-v2
 
-state State {
+state Theme {
   direction LR
-  [*] --> Idle
-  Idle --> Activated: activate
-  Activated --> Idle: deactivate
+  [*] --> light
+  light --> dark: toggleTheme
+  dark --> light: toggleTheme
 }
 ```
 
-Using the state machine as a guide, you can provide an implementation for your application's state by providing:
+We can interpret the state as follows:
 
-1. a type definition for the state
-1. a set of transitions that transform the state
-1. a hook that allows React components to consume the state
+1. The name of our state is `Theme`.
+1. `Theme` is composed by two sub-states: `light` and `dark`.
+1. The default sub-state is `light`.
+1. There is a single _state transition_ named `toggleTheme`.
+1. There is no terminal state.
 
-Begin by defining a type that allows you to represent your state, including all the possible sub-states:
+With this interpretation in mind, we can start translating out state machine into an implementation:
 
-```typescript
-type State = "Idle" | "Activated";
-```
+1. The name of the state becomes the name of our "feature", and is used to create a directory for our files.
+1. In this directory, a single `state.ts` file contains the implementation of our state machine.
+1. We translate the state machine's top level state and sub states into a TypeScript type:
+   ```typescript
+   type Theme = "light" | "dark";
+   ```
+1. We translate the state transitions into React-RxJS signals:
 
-Then, use [signals](https://react-rxjs.org/docs/api/utils/createSignal) to represent and compose the transitions between states. If you create a signal:
+   ```typescript
+   const [toggleTheme$, toggleTheme] = createSignal();
+   ```
 
-```typescript
-const [activate$, activate] = createSignal<void>();
-const [deactivate$, deactivate] = createSignal<void>();
-```
+1. We consume the observable part of the signal to produce an `Observable<Theme>` to share with the rest of our application:
 
-`createSignal` returns tuple, with an observable on the first element and a setter function on the second element. Use the observable to compose your application's state, and export the setter as your state transitions public API. In this case, `activate` and `deactivate` become the public API that allows the user to trigger a state transition, and `activate$` and `deactivate$` the private API that allows you to compose state transitions to produce a new state of your application.
+   ```typescript
+   const [useTheme, theme$] = bind(
+     toggleTheme$.pipe(
+       scan(
+         (currentTheme) => (currentTheme === "light" ? "dark" : "light"),
+         defaultState
+       ),
+       startWith(defaultState)
+     )
+   );
+   ```
 
-For example, this is a possible implementation of our application's state:
+1. And finally we export our public API, which should consist in the **setters** of our signal, the **hooks** (and optionally the **observables** ) derived from consuming the signals:
+   ```typescript
+   export { toggleTheme, useTheme, theme$ };
+   ```
 
-```typescript
-const state$ = merge(
-  activate$.pipe(map(() => "Activated" as const)),
-  deactivate$.pipe(map(() => "Idle" as const))
-).pipe(startWith("Idle"));
-```
+> We keep the "observable" part of the signals private to our module, because they represent strictly user interaction that needs to be "interpreted" by our state machine in order to obtain meaning in our implementation. This should be the norm in most cases.
+> The situation we want to avoid is to introduce _ambiguity_, where a single user interaction may be interpreted in more than 1 way by our application. In cases when the **result** of an user interaction is of global interest to our application, new states may be derived from the public state produced by the module.
+> For example, if we want to log the theme in used by the application, we'd derive that side effect from the already interpreted `theme$` observable, and not from the `toggleTheme$` signal directly, since the meaning of `toggleTheme$` can get out of sync from the value of `theme$`.
 
-> Notice that our state transition functions do not carry a value in this case. Arguably we could implement our state
-> transitions with a single signal:
->
-> `const [transition$, setTransition] = createSignal<State>()`.
->
-> But we want to highlight the importance of the **meaning** of each state transition. As much as possible, your public
-> API should represent your "ideal" state machine without showing the implementation details.
->
-> Later on we will show how sometimes it makes sense to carry data along with a state transition.
+## A Complex Example: Favorite Selection
 
-After that, you can create a hook to allow React components consume the state of your application:
-
-```typescript
-const [useAppState, appState$] = bind(state$);
-```
-
-And finally you can export your public API, which should be your state transitions plus your state hooks:
-
-```typescript
-export { activate, deactivate, useAppState, appState$ };
-```
-
-> `appState$` is the underlying StateObservable behind the `useAppState` hook. This observable is multicast and shared, an you can use it to compose your state with other observables in other parts of your application. I like to recommend only adding to your public API observables that represents state in your application, and carry meaning in your business, rather than using the observable returned by signals. This is because signals are implementation details for a concrete state machine, and you may want to change them in the future, while the state should be a stable concept in your business.
-
-### Example 1 simple state: favorite selection
-
-> [favorites/state.selection.ts](./src/favorites/state.selection.ts)
-
-This state manages the selected favorites in the favorites section, without making any changes to them directly. The state is exposed as global states, and different parts of the application can operate over the selection.
-
-![Favorites Selection](./docs/favorite-selection.gif)
-
-The state is represented by a `FavoritesSelection` type, implemented using a [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set). All state transitions start and end in the same state, but the Set can be empty. There's no need to represent the empty set as an independent state.
-
-> [favorites-manager/state.ts](./src/favorites-manager/state.ts)
+This state manages the selected favorites in the favorites section, without making any changes to them directly. The state is exposed globally, and different parts of the application can operate over the selection.
 
 ```mermaid
 stateDiagram-v2
 state FavoritesSelection {
   direction LR
-  s: Set of string
-
-  [*] --> s
-  s --> s: selectFavorite(favoriteId)
-  s --> s: deselectFavorite(favoriteId)
-  s --> s: bulkDeselectFavorites(favoriteId[])
-  s --> s: selectAllFavorites
-  s --> s: deselectAllFavorites
-  s --> s: clearFavoritesSelection
+  [*] --> selected(id): selectFavorite(id)
+  [*] --> selected(id): selectAllFavorites
+  [*] --> selected(id): bulkDeselectFavorites(favoriteId[id, ...etc])
+  selected(id) --> [*]: deselectAllFavorites
+  selected(id) --> [*]: deselectFavorite(id)
 }
 ```
 
-### Example 2, state with sub states: listing and searching recipes
+![Favorites Selection](./docs/favorite-selection.gif)
+
+### Implementation
+
+> [favorites/state.selection.ts](./src/favorites-manager/state.ts)
+
+The state is represented by a `FavoritesSelection` type, implemented using a [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set).
+
+## Services: Parameterising Operations with State
 
 `RecipeListRequest` is an intermediate state that represents the arguments for a service call. By composing the resulting`Observable<RecipeListRequest>` with an observable service, we produce [`RecipeListResponse`](src/recipes/model.ts), which is the final state we want to offer as a public API of our application.
 

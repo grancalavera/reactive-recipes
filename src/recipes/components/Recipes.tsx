@@ -1,3 +1,4 @@
+import { ThemeSelector } from "../../theme/components/ThemeSelector";
 import { RecipeCount } from "./RecipeCount";
 import { RecipeList } from "./RecipeList";
 import { RecipeLoader } from "./RecipeLoader";
@@ -8,7 +9,7 @@ export const Recipes = () => {
   return (
     <section>
       <h3>
-        Recipes <RecipeCount /> <RecipeLoader />
+        Recipes <RecipeCount /> <RecipeLoader /> <ThemeSelector />
       </h3>
       <RecipeSearch />
       <hr />

@@ -1,10 +1,10 @@
 import { FavoriteSelectionHousekeeper } from "./FavoriteSelectionHousekeeper";
+import { FavoriteSelectionStatus } from "./FavoriteSelectionStatus";
+import { FavoritesBulkLoader } from "./FavoritesBulkLoader";
 import { FavoritesCount } from "./FavoritesCount";
 import { FavoritesList } from "./FavoritesList";
-import { FavoritesBulkLoader } from "./FavoritesBulkLoader";
 import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
-import { FavoriteSelectionStatus } from "./FavoriteSelectionStatus";
 
 export const FavoritesManager = () => (
   <>
