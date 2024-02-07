@@ -9,8 +9,6 @@ import * as model from "./model";
  * In this module the public API members are exported "in situ", as close as possible to their definition.
  * This makes easier to know if a given definition belongs to the public API, but makes it harder to
  * know what is the public API as a whole.
- *
- * For an alternative approach see src/favorites/state.manage.ts
  */
 const [select$, selectFavorite] = createSignal<string>();
 export { selectFavorite };
