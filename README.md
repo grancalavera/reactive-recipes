@@ -3,23 +3,21 @@
 ```
 npm install
 npm run dev
+# then go to http://localhost:5173
 ```
-
-[Reactive Recipes](http://localhost:5173)
 
 https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489d-8965-a6627f61a170
 
 ## Useful links
 
-- [json-server](https://github.com/typicode/json-server)
-- [concurrently](https://github.com/open-cli-tools/concurrently)
+- [json-server](https://github.com/typicode/json-server): used to mock a REST API.
+- [concurrently](https://github.com/open-cli-tools/concurrently): used to start npm tasks concurrently.
 
 ## Reference Material
 
 - For an intuition on how to design functional services, read [Domain Modeling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/)
 - For an intuition on what is considered a side effect, and how to compose side effects, watch [Duality and the End of Reactive](https://youtu.be/SVYGmGYXLpY?si=SC6OFZWVsHUSIXEBb)
-- For an introduction to using finite state machines to describe user interfaces, read [Statecharts: a visual formalism for complex systems
-  ](https://www.sciencedirect.com/science/article/pii/0167642387900359)
+- For an introduction to using finite state machines to describe user interfaces, read [Statecharts: a visual formalism for complex systems](https://www.sciencedirect.com/science/article/pii/0167642387900359)
 
 ## State
 
@@ -88,7 +86,7 @@ And finally you can export your public API, which should be your state transitio
 export { activate, deactivate, useAppState, appState$ };
 ```
 
-> `appState$` is the underlying StateObservable behind the `useAppState` hook. This observable is multicased and shared, an you can use it to compose your state with other observables in other parts of your application. I like to recommend only adding to your public API observables that represents state in your application, and carry meaning in your busines, rather than using the observable returned by signals. This is because signals are implementation details for a concrete state machine, and you may want to change them in the future, while the state should be a stable concept in your business.
+> `appState$` is the underlying StateObservable behind the `useAppState` hook. This observable is multicast and shared, an you can use it to compose your state with other observables in other parts of your application. I like to recommend only adding to your public API observables that represents state in your application, and carry meaning in your business, rather than using the observable returned by signals. This is because signals are implementation details for a concrete state machine, and you may want to change them in the future, while the state should be a stable concept in your business.
 
 ### Example 1 simple state: favorite selection
 
@@ -100,13 +98,13 @@ This state manages the selected favorites in the favorites section, without maki
 
 The state is represented by a `FavoritesSelection` type, implemented using a [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set). All state transitions start and end in the same state, but the Set can be empty. There's no need to represent the empty set as an independent state.
 
-> [favorites/state.model.ts](./src/favorites/state.model.ts)
+> [favorites-manager/state.ts](./src/favorites-manager/state.ts)
 
 ```mermaid
 stateDiagram-v2
 state FavoritesSelection {
   direction LR
-  s: Set#lt;string#gt;
+  s: Set of string
 
   [*] --> s
   s --> s: selectFavorite(favoriteId)
@@ -144,39 +142,15 @@ state RecipeListResponse {
 }
 ```
 
-# Remove all this section!
+## Mutations
 
-Is worth noting this composition has side effects (errors and network calls), but the result is exposed in the same resulting observable state. This is usually the case with read operations, but more often than not **is not the case with mutations**. As seen before, mutation usually have the common side effects (errors, network calls, asynchronicity), but on top of that their result may affect the emissions of other pieces of observable state.
-
-For example, triggering the `addFavorite` transition in [`favorites/state.manage.ts`](src/favorites/state.manage.ts) emits the result of the mutation (`Result<string | string[]>`), which represents the IDs of the successfully manipulated `Favorite` objects. But additionally, it produces an emission of `Favorite[]` for all components using the `useFavorites` hook from the same file (errors are implicit and not shown).
-
-```mermaid
-stateDiagram-v2
-direction LR
-
-state MutationResult {
-  [*] --> Idle
-  Idle --> Awaiting: addFavorite
-  Idle --> Awaiting: removeFavorite
-  Idle --> Awaiting: bulkRemoveFavorites
-  Awaiting --> Success: side effect (network response)
-  Success --> Idle: resetFavoritesResult
-}
-
-state FavoritesList {
-  state "Favorite[]" as F
-  [*] --> F: side effect (network response)
-  F --> F: side effect (network response)
-}
-
-MutationResult --> FavoritesList: side effect (invalidate)
-
-
-```
+- "atomicity": from and to a single component.
+- single responsibility service.
+- side effects composition on state layer.
+- add and remove favorite
+- bulk remove favorite
 
 ## Todo
 
 - [ ] Error handling.
 - [ ] Representing mutations with [MutationResult](src/lib/mutation.ts) probably needs more work.
-- [ ] Unit tests?
-- [ ] Integration tests?
