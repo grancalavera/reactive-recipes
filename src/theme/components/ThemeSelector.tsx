@@ -5,9 +5,8 @@ export const ThemeSelector = () => {
   const theme = useTheme();
 
   useEffect(() => {
-    const [add, remove] =
-      theme === "light" ? ["light", "dark"] : ["dark", "light"];
-    document.body.classList.replace(remove, add);
+    document.body.classList.remove(theme === "dark" ? "light" : "dark");
+    document.body.classList.add(theme);
   }, [theme]);
 
   return <button onClick={() => toggleTheme()}>{theme}</button>;

@@ -1,13 +1,11 @@
 import { bind } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
 import { scan, startWith } from "rxjs";
-
-export type Theme = "light" | "dark";
-const defaultState = "light" as Theme;
+import { defaultState } from "./model";
 
 const [toggleTheme$, toggleTheme] = createSignal();
 
-const [useTheme] = bind(
+const [useTheme, theme$] = bind(
   toggleTheme$.pipe(
     scan(
       (currentTheme) => (currentTheme === "light" ? "dark" : "light"),
@@ -17,4 +15,4 @@ const [useTheme] = bind(
   )
 );
 
-export { toggleTheme, useTheme };
+export { toggleTheme, useTheme, theme$ };

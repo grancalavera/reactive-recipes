@@ -15,7 +15,7 @@ https://github.com/grancalavera/reactive-recipes/assets/301030/c7139949-7a51-489
 
 ## Reference Material
 
-- For an intuition on how to design functional services, read [Domain Modeling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/)
+- For an intuition on how to design functional services, read [Domain Modelling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/)
 - For an intuition on what is considered a side effect, and how to compose side effects, watch [Duality and the End of Reactive](https://youtu.be/SVYGmGYXLpY?si=SC6OFZWVsHUSIXEBb)
 - For an introduction to using finite state machines to describe user interfaces, read [Statecharts: a visual formalism for complex systems](https://www.sciencedirect.com/science/article/pii/0167642387900359)
 

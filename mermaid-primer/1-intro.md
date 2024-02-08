@@ -1,0 +1,3 @@
+```mermaid
+stateDiagram-v2
+```
