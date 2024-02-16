@@ -1,3 +1,5 @@
+# Composition and Communication
+
 ```mermaid
 stateDiagram-v2
 direction LR
