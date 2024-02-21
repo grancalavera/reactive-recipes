@@ -87,11 +87,14 @@ This state manages the selected favorites in the favorites section, without maki
 stateDiagram-v2
 state FavoritesSelection {
   direction LR
-  [*] --> selected(id): selectFavorite(id)
-  [*] --> selected(id): selectAllFavorites
-  [*] --> selected(id): bulkDeselectFavorites(favoriteId[id, ...etc])
-  selected(id) --> [*]: deselectAllFavorites
-  selected(id) --> [*]: deselectFavorite(id)
+  [*] --> EmptySelection
+  EmptySelection --> FilledSelection: selectFavorite(id)
+  EmptySelection --> FilledSelection: selectAllFavorites
+  FilledSelection --> FilledSelection: bulkDeselectFavorites(id1, id2, ..., idn)
+  FilledSelection --> EmptySelection: bulkDeselectFavorites(id1, id2, ..., idn)
+  FilledSelection --> EmptySelection: deselectAllFavorites
+  FilledSelection --> EmptySelection: deselectFavorite(id)
+  FilledSelection --> FilledSelection: deselectFavorite(id)
 }
 ```
 
