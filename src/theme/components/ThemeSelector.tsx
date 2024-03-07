@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { toggleTheme, useTheme } from "../state";
+import { toggleTheme } from "../state";
+import { useTheme } from "../model";
 
 export const ThemeSelector = () => {
   const theme = useTheme();
