@@ -1,5 +1,4 @@
 ```mermaid
 stateDiagram-v2
-
 [*] --> [*]
 ```
