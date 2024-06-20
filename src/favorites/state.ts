@@ -13,7 +13,7 @@ import { Favorite } from "./model";
  * a rename in the definition will not rename the exported definitions, so most of the times you'll need
  * to run two refactors as opposed to one.
  *
- * For an alternative approach see src/favorites/state.selection.ts
+ * For an alternative approach see src/favorites-manager/state.ts
  */
 export {
   favorites$,
