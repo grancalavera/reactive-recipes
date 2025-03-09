@@ -1,4 +1,4 @@
-import { Observable, map, switchMap } from "rxjs";
+import { Observable, delay, map, switchMap } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
 import { httpErrorFromResponse } from "../lib/errors";
 import {
@@ -30,7 +30,8 @@ export const recipeList$ = (
         count: parseInt(response.headers.get("x-total-count") ?? "0"),
       };
     }),
-    map((data) => recipeListResultSchema.parse(data))
+    map((data) => recipeListResultSchema.parse(data)),
+    delay(600)
   );
 };
 

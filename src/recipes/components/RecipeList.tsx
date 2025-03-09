@@ -1,23 +1,26 @@
 import { RecipeLoader } from "./RecipeLoader";
 import { RecipeSummary } from "./RecipeSummary";
 import { useIsLoadingRecipes, useRecipeList } from "../state";
+import { Subscribe } from "@react-rxjs/core";
 
 export const RecipeList = () => {
-  const { results } = useRecipeList();
+  const { results: recipes } = useRecipeList();
   const isLoadingRecipes = useIsLoadingRecipes();
 
-  if (results.length === 0 && isLoadingRecipes) {
+  if (recipes.length === 0 && isLoadingRecipes) {
     return <RecipeLoader />;
   }
 
-  if (results.length === 0) {
+  if (recipes.length === 0) {
     return <>No Results.</>;
   }
 
   return (
     <ul>
-      {results.map((recipe) => (
-        <RecipeSummary key={recipe.id} recipe={recipe} />
+      {recipes.map((recipe) => (
+        <Subscribe key={recipe.id}>
+          <RecipeSummary recipe={recipe} />
+        </Subscribe>
       ))}
     </ul>
   );

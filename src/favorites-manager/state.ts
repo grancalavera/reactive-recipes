@@ -1,8 +1,8 @@
 import { bind, state } from "@react-rxjs/core";
 import { createSignal, mergeWithKey } from "@react-rxjs/utils";
 import { combineLatest, first, map, scan, startWith, switchMap } from "rxjs";
-import { assertNever } from "../lib/assertNever";
 import { favorites$ } from "../favorites/state";
+import { assertNever } from "../lib/assertNever";
 import * as model from "./model";
 
 /**
@@ -34,9 +34,10 @@ const signal$ = mergeWithKey({
     switchMap(() => favorites$.pipe(first())),
     map((favorites) => favorites.map((x) => x.id))
   ),
+  clearZombies$: favorites$,
 });
 
-const state$ = state(signal$).pipe(
+export const favoriteSelection$ = state(signal$).pipe(
   scan((selection, signal) => {
     switch (signal.type) {
       case "select$": {
@@ -54,6 +55,16 @@ const state$ = state(signal$).pipe(
       case "selectAll$": {
         return model.selectAllFavorites(selection, signal.payload);
       }
+      case "clearZombies$": {
+        const zombies = model.zombieFavoritesSelection(
+          [...selection],
+          signal.payload
+        );
+
+        return zombies.length
+          ? model.bulkDeselectFavorites(selection, zombies)
+          : selection;
+      }
       default: {
         assertNever(signal);
       }
@@ -63,21 +74,13 @@ const state$ = state(signal$).pipe(
 );
 
 export const [useIsFavoriteSelected] = bind((id: string) =>
-  state$.pipe(map(model.isFavoriteSelected(id)))
+  favoriteSelection$.pipe(map(model.isFavoriteSelected(id)))
 );
 
 const [useFavoriteSelection, selection$] = bind(
-  state$.pipe(map((selection) => [...selection]))
+  favoriteSelection$.pipe(map((selection) => [...selection]))
 );
 export { useFavoriteSelection };
-
-export const [useZombieFavoriteSelection] = bind(
-  combineLatest([selection$, favorites$]).pipe(
-    map(([selection, favorites]) =>
-      model.zombieFavoritesSelection(selection, favorites)
-    )
-  )
-);
 
 export const [useAreAllFavoritesSelected] = bind(
   combineLatest([

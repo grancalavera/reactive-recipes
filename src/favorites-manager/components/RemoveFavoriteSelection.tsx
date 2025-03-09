@@ -14,7 +14,7 @@ export const RemoveFavoriteSelection = () => {
     if (isSuccess(result) && isSelectionEmpty) {
       const one = result.data.length === 1;
       toast.success(`${result.data.length} favorite${one ? "" : "s"} removed`, {
-        position: toast.POSITION.BOTTOM_LEFT,
+        position: "bottom-left",
       });
       reset();
     }
@@ -25,7 +25,6 @@ export const RemoveFavoriteSelection = () => {
       className="icon-button"
       disabled={!enabled}
       onClick={() => {
-        console.log("RemoveFavoriteSelection: onClick");
         mutate(selection);
       }}
     >
