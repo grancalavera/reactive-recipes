@@ -24,7 +24,7 @@ export const FavoriteSummary = ({ favorite }: { favorite: Favorite }) => {
         }}
       />
       <RemoveFavorite id={favorite.id} />
-      {favorite.recipeName} ({favorite.id})
+      {favorite.recipeName}
     </>
   );
 };
