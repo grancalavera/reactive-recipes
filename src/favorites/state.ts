@@ -2,32 +2,8 @@ import { bind } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
 import { filter, first, lastValueFrom, map, startWith } from "rxjs";
 import { useMutation } from "../lib/mutation";
-import * as service from "./service";
 import { Favorite } from "./model";
-
-/**
- * In this module the public API is defined as a single `export` block at the top of the file. This
- * makes it easier to very quickly see what conforms the public API, but has the disadvantage of
- * making it harder to know if a given definition in the module belongs to the public API, you always
- * need to check in two places. Also it makes it slightly harder to rename API members in VSCode, since
- * a rename in the definition will not rename the exported definitions, so most of the times you'll need
- * to run two refactors as opposed to one.
- *
- * For an alternative approach see src/favorites-manager/state.ts
- */
-export {
-  favorites$,
-  findFavoriteByRecipeId$,
-  useAddFavorite,
-  useBulkRemoveFavorites,
-  useFavorites,
-  useFavoritesRemovalInProgress as useFavoritesBatchInProgress,
-  useFindFavoriteByRecipeId,
-  useIsFavoriteById,
-  useIsFavoriteRecipe,
-  useIsFavoritesEmpty,
-  useRemoveFavorite,
-};
+import * as service from "./service";
 
 const [useFavorites, favorites$] = bind<Favorite[]>(
   service.favorites$.pipe(startWith([]))
@@ -97,3 +73,27 @@ const useBulkRemoveFavorites = () =>
 const [useFavoritesRemovalInProgress] = bind(
   favoritesRemovalInProgress$.pipe(startWith(false))
 );
+
+/**
+ * In this module the public API is defined as a single `export` block. This
+ * makes it easier to very quickly see what conforms the public API, but has the disadvantage of
+ * making it harder to know if a given definition in the module belongs to the public API, you always
+ * need to check in two places. Also it makes it slightly harder to rename API members in VSCode, since
+ * a rename in the definition will not rename the exported definitions, so most of the times you'll need
+ * to run two refactors as opposed to one.
+ *
+ * For an alternative approach see src/favorites-manager/state.ts
+ */
+export {
+  favorites$,
+  findFavoriteByRecipeId$,
+  useAddFavorite,
+  useBulkRemoveFavorites,
+  useFavorites,
+  useFavoritesRemovalInProgress as useFavoritesBatchInProgress,
+  useFindFavoriteByRecipeId,
+  useIsFavoriteById,
+  useIsFavoriteRecipe,
+  useIsFavoritesEmpty,
+  useRemoveFavorite,
+};

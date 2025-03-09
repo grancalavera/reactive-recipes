@@ -5,6 +5,12 @@ body {
   height: 100vh;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -101,4 +107,16 @@ h3 > small {
   color: white;
   padding: 6px;
   border-radius: 4px;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.full-screen {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
 }

@@ -1,4 +1,4 @@
-import { FavoriteSelectionHousekeeper } from "./FavoriteSelectionHousekeeper";
+import { Subscribe } from "@react-rxjs/core";
 import { FavoriteSelectionStatus } from "./FavoriteSelectionStatus";
 import { FavoritesBulkLoader } from "./FavoritesBulkLoader";
 import { FavoritesCount } from "./FavoritesCount";
@@ -7,7 +7,7 @@ import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
 
 export const FavoritesManager = () => (
-  <>
+  <Subscribe>
     <section style={{ position: "relative" }}>
       <h3>
         Favorites <FavoritesBulkLoader />
@@ -22,6 +22,5 @@ export const FavoritesManager = () => (
       <hr />
       <FavoriteSelectionStatus />
     </section>
-    <FavoriteSelectionHousekeeper />
-  </>
+  </Subscribe>
 );

@@ -8,7 +8,7 @@ type Loading = "Loading";
 export const idle: Idle = "Idle";
 export const loading: Loading = "Loading";
 
-export function success<T = void>(): Success<void>;
+export function success(): Success<void>;
 export function success<T>(data: T): Success<T>;
 export function success<T = void>(data?: T): Success<T | void> {
   return { data };
