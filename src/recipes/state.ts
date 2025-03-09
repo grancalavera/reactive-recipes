@@ -4,7 +4,6 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  merge,
   Observable,
   scan,
   startWith,

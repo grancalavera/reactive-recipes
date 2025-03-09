@@ -1,6 +1,6 @@
 import {
   useIsFavoritesEmpty,
-  useFavoritesBatchInProgress,
+  useFavoritesRemovalInProgress,
 } from "../../favorites/state";
 import {
   deselectAllFavorites,
@@ -10,7 +10,7 @@ import {
 
 export const ToggleSelectAllFavorites = () => {
   const selected = useAreAllFavoritesSelected();
-  const isLoading = useFavoritesBatchInProgress();
+  const isLoading = useFavoritesRemovalInProgress();
   const isFavoritesEmpty = useIsFavoritesEmpty();
 
   return (
