@@ -33,9 +33,14 @@ const [favoritesRemovalInProgress$, toggleFavoritesRemovalInProgress] =
 // add specialized callbacks to the mutation constructor hook, a much simpler approach is to just
 // wrap the mutation function itself into another function that performs any arbitrary side effects,
 // while still retaining the same signature as the original function.
-const bulkDeleteFavoritesWithSideEffects = async (
+export const bulkDeleteFavorites = async (
   batch: string[]
 ): Promise<string[]> => {
+  // artificial error to force handling of unknown errors
+  if (batch.length === 1) {
+    throw new Error("Cannot remove a single favorite");
+  }
+
   // perform a side effect: show loader
   toggleFavoritesRemovalInProgress(true);
 
@@ -67,9 +72,6 @@ const useAddFavorite = () => useMutation(service.postFavorite);
 
 const useRemoveFavorite = () => useMutation(service.deleteFavorite);
 
-const useBulkRemoveFavorites = () =>
-  useMutation(bulkDeleteFavoritesWithSideEffects);
-
 const [useFavoritesRemovalInProgress] = bind(
   favoritesRemovalInProgress$.pipe(startWith(false))
 );
@@ -88,9 +90,8 @@ export {
   favorites$,
   findFavoriteByRecipeId$,
   useAddFavorite,
-  useBulkRemoveFavorites,
   useFavorites,
-  useFavoritesRemovalInProgress as useFavoritesBatchInProgress,
+  useFavoritesRemovalInProgress,
   useFindFavoriteByRecipeId,
   useIsFavoriteById,
   useIsFavoriteRecipe,
