@@ -1,10 +1,12 @@
 import { Subscribe } from "@react-rxjs/core";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { FavoriteSelectionStatus } from "./FavoriteSelectionStatus";
 import { FavoritesBulkLoader } from "./FavoritesBulkLoader";
 import { FavoritesCount } from "./FavoritesCount";
 import { FavoritesList } from "./FavoritesList";
 import { RemoveFavoriteSelection } from "./RemoveFavoriteSelection";
 import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
+import { errorFromUnknown } from "../../lib/errors";
 
 export const FavoritesManager = () => (
   <Subscribe>
@@ -14,7 +16,11 @@ export const FavoritesManager = () => (
       </h3>
       <div className="ribbon">
         <ToggleSelectAllFavorites />
-        <RemoveFavoriteSelection />
+
+        <ErrorBoundary FallbackComponent={Fallback}>
+          <RemoveFavoriteSelection />
+        </ErrorBoundary>
+
         <FavoritesCount />
       </div>
       <hr />
@@ -23,4 +29,11 @@ export const FavoritesManager = () => (
       <FavoriteSelectionStatus />
     </section>
   </Subscribe>
+);
+
+const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => (
+  <div>
+    <p>{errorFromUnknown(error).message}</p>
+    <button onClick={() => resetErrorBoundary()}>Try again</button>
+  </div>
 );

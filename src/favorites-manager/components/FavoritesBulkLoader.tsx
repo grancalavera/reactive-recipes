@@ -1,8 +1,8 @@
 import { LoadingAnimation } from "../../components/LoadingAnimation";
-import { useFavoritesBatchInProgress } from "../../favorites/state";
+import { useFavoritesRemovalInProgress } from "../../favorites/state";
 
 export const FavoritesBulkLoader = () => {
-  const isLoading = useFavoritesBatchInProgress();
+  const isLoading = useFavoritesRemovalInProgress();
   return isLoading ? (
     <small>
       <LoadingAnimation />
