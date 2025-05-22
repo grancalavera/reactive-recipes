@@ -38,6 +38,6 @@
     "json-server": "0.17.4",
     "patch-package": "8.0.0",
     "typescript": "5.8.2",
-    "vite": "6.2.1"
+    "vite": "6.3.5"
   }
 }
