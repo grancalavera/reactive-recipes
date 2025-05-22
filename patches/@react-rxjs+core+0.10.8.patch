@@ -1,0 +1,20 @@
+diff --git a/node_modules/@react-rxjs/core/dist/Subscribe.d.ts b/node_modules/@react-rxjs/core/dist/Subscribe.d.ts
+index 77f7df5..e56a789 100644
+--- a/node_modules/@react-rxjs/core/dist/Subscribe.d.ts
++++ b/node_modules/@react-rxjs/core/dist/Subscribe.d.ts
+@@ -21,9 +21,13 @@ export declare const useSubscription: () => ((src: StateObservable<any>) => void
+  * @remarks This Component doesn't trigger any updates from the source$.
+  */
+ export declare const Subscribe: React.FC<{
+-    children?: React.ReactNode | undefined;
++    children?: ReactNode | undefined;
++    source$: Observable<any>;
++    fallback?: Exclude<ReactNode, undefined>;
++} | {
++    children?: ReactNode |undefined;
+     source$?: Observable<any>;
+-    fallback?: NonNullable<ReactNode> | null;
++    fallback: Exclude<ReactNode, undefined>;
+ }>;
+ /**
+  * Component that prevents its children from using the parent `Subscribe` boundary
