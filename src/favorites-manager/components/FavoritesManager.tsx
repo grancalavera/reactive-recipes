@@ -9,7 +9,7 @@ import { ToggleSelectAllFavorites } from "./ToggleSelectAllFavorites";
 import { errorFromUnknown } from "../../lib/errors";
 
 export const FavoritesManager = () => (
-  <Subscribe>
+  <Subscribe fallback={null}>
     <section style={{ position: "relative" }}>
       <h3>
         Favorites <FavoritesBulkLoader />

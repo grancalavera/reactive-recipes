@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 function App() {
   return (
     <>
-      <Subscribe>
+      <Subscribe fallback={null}>
         <Layout sidebar={<FavoritesManager />} content={<Recipes />} />
       </Subscribe>
       <ToastContainer autoClose={800} />

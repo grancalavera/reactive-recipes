@@ -18,7 +18,7 @@ export const RecipeList = () => {
   return (
     <ul>
       {recipes.map((recipe) => (
-        <Subscribe key={recipe.id}>
+        <Subscribe key={recipe.id} fallback={null}>
           <RecipeSummary recipe={recipe} />
         </Subscribe>
       ))}
