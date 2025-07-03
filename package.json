@@ -12,7 +12,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "create-db": "cp db-seed.json db.json",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@react-rxjs/core": "0.10.8",
@@ -38,6 +39,7 @@
     "json-server": "0.17.4",
     "patch-package": "8.0.0",
     "typescript": "5.8.2",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "vitest": "0.34.6"
   }
 }
