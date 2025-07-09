@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 db.json
+
+# Test coverage
+coverage/

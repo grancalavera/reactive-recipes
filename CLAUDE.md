@@ -17,7 +17,16 @@ npm install
 # Start development server (runs both JSON server and Vite)
 npm run dev
 
-# Build for production
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Build project
 npm run build
 
 # Lint code
@@ -30,117 +39,82 @@ npm run typecheck
 npm run preview
 ```
 
-### Development Server Details
+## Testing
 
-- `npm run dev` runs both the JSON server (port 3000) and Vite dev server (port 5173) concurrently
-- JSON server uses `db.json` as the data source (copied from `db-seed.json`)
-- Main application available at http://localhost:5173
-- API endpoints available at http://localhost:3000
+### Framework
 
-## Architecture Overview
+The project uses Vitest as the testing framework with the following setup:
 
-### State Management Pattern
+- **Test runner**: Vitest
+- **React testing**: @testing-library/react
+- **DOM matchers**: @testing-library/jest-dom
+- **User interactions**: @testing-library/user-event
+- **Environment**: jsdom
 
-The application uses a state machine-driven architecture with React-RxJS:
+### Running Tests
 
-1. **State Machines**: Each feature defines its state using state machine concepts with TypeScript types
-2. **Signals**: User interactions are captured as RxJS signals using `createSignal()`
-3. **State Reducers**: State transitions are handled through reducer functions in `scan()` operators
-4. **Hooks**: State is consumed via React hooks created with `bind()`
+```bash
+# Run all tests once
+npm test
 
-### Directory Structure
+# Run tests in watch mode (re-runs on file changes)
+npm run test:watch
 
-```
-src/
-├── components/          # Shared UI components
-├── lib/                 # Utilities (mutation, result, errors)
-├── theme/              # Theme state management
-├── recipes/            # Recipe listing and search
-├── favorites/          # Individual favorite operations
-├── favorites-manager/  # Bulk favorite selection
+# Run tests with coverage report
+npm run test:coverage
 ```
 
-### Key Architectural Concepts
+### Coverage Thresholds
 
-#### State Management
+Tests must maintain minimum coverage of 80% for:
 
-- Each feature has a `state.ts` file implementing the state machine
-- Features export signals (action creators) and hooks (state consumers)
-- State machines are defined with TypeScript types representing states and transitions
+- Branches
+- Functions
+- Lines
+- Statements
 
-#### Service Layer
+### Test File Conventions
 
-- Services handle async operations and API calls
-- Use `switchMap` to handle request/response cycles
-- Services are consumed by state machines, not directly by components
+- Test files should be named `*.test.ts` or `*.test.tsx`
+- Place test files next to the code they test
+- Use descriptive test names and group related tests in `describe` blocks
 
-#### Mutation Pattern
+### Example Test Structure
 
-- Async mutations use the `useMutation` hook from `src/lib/mutation.ts`
-- Mutations return `AsyncResult<T>` types with states: Idle, Loading, Error, Success
-- Results are handled with type guards (`isLoading`, `isSuccess`, `isError`)
+```typescript
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { ComponentName } from "./ComponentName";
 
-#### Component Organization
+describe("ComponentName", () => {
+  it("should render with expected behavior", () => {
+    render(<ComponentName />);
+    expect(screen.getByText("Expected text")).toBeInTheDocument();
+  });
+});
+```
 
-- Components are organized by feature in their respective directories
-- Each feature exports its main component and supporting components
-- Components primarily consume state via hooks, not observables directly
+### CI/CD
 
-### Key Libraries
+Tests run automatically on:
 
-- **@react-rxjs/core**: Core React-RxJS bindings (`bind`, `state`)
-- **@react-rxjs/utils**: Utilities (`createSignal`, `mergeWithKey`)
-- **rxjs**: Observable operators (`scan`, `switchMap`, `startWith`, etc.)
-- **zod**: Schema validation
-- **react-error-boundary**: Error handling
-- **json-server**: Mock API server
+- Pull requests to main branch
+- Pushes to main branch
+- CI will fail if tests fail or coverage drops below thresholds
 
-### Testing
+## Security
 
-No specific test framework is currently configured. Check README for any testing setup instructions.
+The devcontainer includes network restrictions allowing only essential domains:
 
-## Development Patterns
+- GitHub (for git operations)
+- NPM registry (for package management)
+- Anthropic APIs (for Claude Code functionality)
+- Statsig (for telemetry)
 
-### Creating New Features
+## Notes for Claude Code
 
-1. Create feature directory with `components/`, `model.ts`, `state.ts`, `service.ts` (if needed)
-2. Define state machine in `model.ts` with TypeScript types
-3. Implement state management in `state.ts` using React-RxJS patterns
-4. Create service functions in `service.ts` for async operations
-5. Build components that consume state via exported hooks
-
-### State Machine Implementation
-
-- Define states as TypeScript union types
-- Use `createSignal()` for user interactions
-- Implement state transitions with `scan()` and reducer functions
-- Export signals (actions) and hooks (state consumers)
-- Keep observables private to the module
-
-### Error Handling
-
-- Use `AsyncResult<T>` types for async operations
-- Handle errors with `errorFromUnknown` utility
-- Implement error boundaries for component-level error handling
-
-## Libraries and Frameworks
-
-### React-RxJS Integration
-
-- **Overview**: React-RxJS is a lightweight library that provides RxJS bindings for React, enabling reactive state management
-- **Key Concepts**:
-  - `createSignal()`: Creates action streams for user interactions
-  - `bind()`: Converts observables to React hooks for seamless state consumption
-  - `state()`: Creates stateful observables with initial values
-  - Supports complex state management with RxJS operators
-- **Getting Started with React-RxJS**:
-  - Install via `npm install @react-rxjs/core @react-rxjs/utils`
-  - Create signals for actions using `createSignal()`
-  - Use `bind()` to create hooks that consume state
-  - Leverage RxJS operators for state transformations
-  - Example pattern: `const [useMyState, myState$] = state(initialState)`
-- **Best Practices**:
-  - Keep state logic in dedicated files (e.g., `state.ts`)
-  - Use type-safe state machines
-  - Prefer declarative state management over imperative updates
-  - Separate concerns between state management, services, and components
+- The project uses TypeScript with React
+- Follow existing code patterns and conventions
+- Use the devcontainer for consistent development environment
+- Network restrictions are in place for security
+- Write tests for new features and bug fixes
