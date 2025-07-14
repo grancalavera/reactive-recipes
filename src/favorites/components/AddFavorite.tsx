@@ -11,6 +11,7 @@ export const AddFavorite = ({ recipe }: { recipe: Recipe }) => {
   return (
     <button
       className="icon-button"
+      data-testid="add-favorite-button"
       disabled={loading}
       onClick={() => mutate({ recipeId: recipe.id, recipeName: recipe.name })}
     >
